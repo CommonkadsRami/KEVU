@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paris — Personalized Itinerary</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F5F0E8;
+    --warm-white: #FAF7F2;
+    --stone: #C8BFA8;
+    --taupe: #9E9080;
+    --charcoal: #2A2520;
+    --espresso: #3D3028;
+    --gold: #B8965A;
+    --sage: #7A8A72;
+    --blush: #D4B8A0;
+    --ink: #1A1510;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--charcoal);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 4rem 5vw 5rem;
+    overflow: hidden;
+    background: var(--espresso);
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 80%, rgba(184,150,90,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(122,138,114,0.1) 0%, transparent 50%),
+      linear-gradient(170deg, #1A1510 0%, #2A2520 40%, #3D3028 100%);
+    z-index: 0;
+  }
+
+  .hero-texture {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    z-index: 0;
+  }
+
+  .eiffel-silhouette {
+    position: absolute;
+    right: 8vw;
+    bottom: 0;
+    width: 180px;
+    opacity: 0.06;
+    z-index: 0;
+  }
+
+  .hero-label {
+    position: relative;
+    z-index: 1;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-title {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(4rem, 12vw, 9rem);
+    font-weight: 300;
+    color: var(--warm-white);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.4s forwards;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-subtitle {
+    position: relative;
+    z-index: 1;
+    margin-top: 2rem;
+    font-size: 1.1rem;
+    font-weight: 300;
+    color: var(--stone);
+    letter-spacing: 0.05em;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.6s forwards;
+  }
+
+  .hero-divider {
+    position: relative;
+    z-index: 1;
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 2rem 0;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.5s forwards;
+  }
+
+  .hero-meta {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 3rem;
+    margin-top: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.8s forwards;
+  }
+
+  .hero-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .meta-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--taupe);
+    text-transform: uppercase;
+  }
+
+  .meta-value {
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: var(--stone);
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    animation: fadeIn 1s ease 1.2s forwards;
+  }
+
+  .scroll-hint span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    color: var(--taupe);
+    text-transform: uppercase;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  .accommodation-strip {
+    background: var(--charcoal);
+    padding: 1.5rem 5vw;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .accomm-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .accomm-stays {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    flex: 1;
+  }
+
+  .stay-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0 2rem;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .stay-block:first-child { padding-left: 0; }
+  .stay-block:last-child { border-right: none; }
+
+  .stay-dates {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--taupe);
+    letter-spacing: 0.15em;
+  }
+
+  .stay-name {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--stone);
+  }
+
+  .itinerary {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 5rem 5vw 8rem;
+  }
+
+  .section-intro {
+    margin-bottom: 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: end;
+  }
+
+  .section-intro h2 {
+    font-size: 2.2rem;
+    font-weight: 300;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .section-intro h2 em { font-style: italic; color: var(--gold); }
+
+  .section-intro p {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--taupe);
+  }
+
+  .day-card {
+    margin-bottom: 3px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .day-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .day-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+    background: var(--warm-white);
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: border-color 0.3s ease, background 0.2s ease;
+    user-select: none;
+  }
+
+  .day-card.active .day-header {
+    border-left-color: var(--gold);
+    background: #F8F3EA;
+  }
+
+  .day-header:hover { background: #F8F3EA; }
+
+  .day-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--taupe);
+    text-transform: uppercase;
+  }
+
+  .day-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+
+  .day-name {
+    font-size: 1.3rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--espresso);
+  }
+
+  .day-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--stone);
+    color: var(--taupe);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .day-card.active .day-tag {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .day-chevron {
+    width: 16px;
+    height: 16px;
+    border-right: 1.5px solid var(--taupe);
+    border-bottom: 1.5px solid var(--taupe);
+    transform: rotate(45deg);
+    transition: transform 0.3s ease;
+    margin-left: 0.5rem;
+  }
+
+  .day-card.active .day-chevron {
+    transform: rotate(-135deg);
+    border-color: var(--gold);
+  }
+
+  .day-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--warm-white);
+    border-left: 3px solid var(--gold);
+  }
+
+  .day-card.active .day-body {
+    max-height: 1200px;
+  }
+
+  .day-body-inner {
+    padding: 2rem;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .events-timeline {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .event {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 1.5rem;
+    padding: 1.2rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .event:last-child { border-bottom: none; }
+
+  .event-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--taupe);
+    letter-spacing: 0.1em;
+    padding-top: 0.15rem;
+    text-align: right;
+  }
+
+  .event-category {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .event-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-run { background: var(--sage); }
+  .dot-coffee { background: #8B6B4A; }
+  .dot-solo { background: var(--gold); }
+  .dot-joint { background: var(--blush); }
+  .dot-work { background: var(--taupe); }
+  .dot-strength { background: #7A6A8A; }
+  .dot-food { background: #C4785A; }
+
+  .event-cat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    color: var(--taupe);
+    text-transform: uppercase;
+  }
+
+  .event-title {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--espresso);
+    line-height: 1.4;
+    margin-bottom: 0.3rem;
+  }
+
+  .event-desc {
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: var(--taupe);
+    line-height: 1.6;
+  }
+
+  .event-note {
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    background: rgba(184,150,90,0.08);
+    border-left: 2px solid var(--gold);
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--taupe);
+    font-style: italic;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    margin-bottom: 3rem;
+    padding: 1.5rem 2rem;
+    background: var(--warm-white);
+    border-left: 3px solid var(--stone);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .legend-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--taupe);
+    text-transform: uppercase;
+  }
+
+  .note-card {
+    margin-top: 4rem;
+    padding: 2rem;
+    background: var(--charcoal);
+    color: var(--stone);
+  }
+
+  .note-card h3 {
+    font-size: 0.7rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .note-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .note-card li {
+    font-size: 0.9rem;
+    font-weight: 300;
+    line-height: 1.5;
+    padding-left: 1.2rem;
+    position: relative;
+    color: var(--stone);
+  }
+
+  .note-card li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+  }
+
+  @media (max-width: 600px) {
+    .section-intro { grid-template-columns: 1fr; }
+    .hero-meta { flex-wrap: wrap; gap: 1.5rem; }
+    .stay-block { padding: 0 1rem; }
+    .day-header { grid-template-columns: auto 1fr; }
+    .day-tag, .day-chevron { display: none; }
+    .event { grid-template-columns: 60px 1fr; gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-texture"></div>
+
+  <svg class="eiffel-silhouette" viewBox="0 0 200 500" fill="white" xmlns="http://www.w3.org/2000/svg">
+    <path d="M100 0 L90 80 L60 160 L40 240 L20 320 L10 400 L0 500 L200 500 L190 400 L180 320 L160 240 L140 160 L110 80 Z" opacity="0.5"/>
+    <rect x="88" y="0" width="24" height="8" rx="2"/>
+    <rect x="60" y="155" width="80" height="12" rx="2"/>
+    <rect x="30" y="235" width="140" height="14" rx="2"/>
+    <rect x="5" y="318" width="190" height="16" rx="2"/>
+  </svg>
+
+  <p class="hero-label">Personal Itinerary</p>
+  <h1 class="hero-title">Paris<br><em>Trip</em><br>Plan</h1>
+  <div class="hero-divider"></div>
+  <p class="hero-subtitle">Use this as your base and swap details day by day</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">
+      <span class="meta-label">Trip Style</span>
+      <span class="meta-value">Balanced solo + shared time</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="meta-label">Focus</span>
+      <span class="meta-value">Culture · Training · Food</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="meta-label">Pace</span>
+      <span class="meta-value">Structured mornings, open afternoons</span>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<div class="accommodation-strip">
+  <span class="accomm-label">Accommodation</span>
+  <div class="accomm-stays">
+    <div class="stay-block">
+      <span class="stay-dates">NIGHT 1</span>
+      <span class="stay-name">Airport or arrival hotel</span>
+    </div>
+    <div class="stay-block">
+      <span class="stay-dates">NIGHT 2</span>
+      <span class="stay-name">Central Paris stay</span>
+    </div>
+    <div class="stay-block">
+      <span class="stay-dates">NIGHT 3+</span>
+      <span class="stay-name">Base for day trips</span>
+    </div>
+  </div>
+</div>
+
+<main class="itinerary">
+  <div class="section-intro">
+    <div>
+      <h2>Your week,<br><em>designed for flow</em></h2>
+    </div>
+    <div>
+      <p>This version keeps the same premium look and accordion interaction as Claude's file, but is generalized so you can quickly tailor names, dates, and activities to your exact trip details.</p>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot dot-run"></div><span class="legend-label">Run</span></div>
+    <div class="legend-item"><div class="legend-dot dot-strength"></div><span class="legend-label">Strength</span></div>
+    <div class="legend-item"><div class="legend-dot dot-coffee"></div><span class="legend-label">Coffee</span></div>
+    <div class="legend-item"><div class="legend-dot dot-solo"></div><span class="legend-label">Solo explore</span></div>
+    <div class="legend-item"><div class="legend-dot dot-joint"></div><span class="legend-label">Together</span></div>
+    <div class="legend-item"><div class="legend-dot dot-work"></div><span class="legend-label">Work</span></div>
+    <div class="legend-item"><div class="legend-dot dot-food"></div><span class="legend-label">Food</span></div>
+  </div>
+
+  <div class="day-card" data-day="0">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-number">Day 1</span>
+      <div class="day-title-block">
+        <div class="day-date">Arrival Day</div>
+        <div class="day-name">Travel + Gentle Start</div>
+      </div>
+      <span class="day-tag">Transit</span>
+      <div class="day-chevron"></div>
+    </div>
+    <div class="day-body">
+      <div class="day-body-inner">
+        <div class="events-timeline">
+          <div class="event">
+            <span class="event-time">Morning</span>
+            <div class="event-content">
+              <div class="event-category"><div class="event-dot dot-joint"></div><span class="event-cat-label">Travel</span></div>
+              <div class="event-title">Arrive in Paris</div>
+              <div class="event-desc">Keep this block flexible for flights, train arrival, or drive-in timing.</div>
+            </div>
+          </div>
+          <div class="event">
+            <span class="event-time">Afternoon</span>
+            <div class="event-content">
+              <div class="event-category"><div class="event-dot dot-solo"></div><span class="event-cat-label">Solo walk</span></div>
+              <div class="event-title">Neighbourhood orientation walk</div>
+              <div class="event-desc">Pick a low-pressure loop around your hotel to get familiar and reset your energy.</div>
+            </div>
+          </div>
+          <div class="event">
+            <span class="event-time">Evening</span>
+            <div class="event-content">
+              <div class="event-category"><div class="event-dot dot-food"></div><span class="event-cat-label">Food</span></div>
+              <div class="event-title">Simple dinner + early night</div>
+              <div class="event-desc">Prioritize rest so the next day starts strong.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="day-card" data-day="1">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-number">Day 2</span>
+      <div class="day-title-block">
+        <div class="day-date">City Core Day</div>
+        <div class="day-name">Run + Museums + Terrace</div>
+      </div>
+      <span class="day-tag">Classic</span>
+      <div class="day-chevron"></div>
+    </div>
+    <div class="day-body">
+      <div class="day-body-inner">
+        <div class="events-timeline">
+          <div class="event">
+            <span class="event-time">06:30</span>
+            <div class="event-content">
+              <div class="event-category"><div class="event-dot dot-run"></div><span class="event-cat-label">Run</span></div>
+              <div class="event-title">Easy city run</div>
+              <div class="event-desc">Route idea: Seine embankment or Parc Monceau loop.</div>
+            </div>
+          </div>
+          <div class="event">
+            <span class="event-time">09:00</span>
+            <div class="event-content">
+              <div class="event-category"><div class="event-dot dot-coffee"></div><span class="event-cat-label">Coffee</span></div>
+              <div class="event-title">Specialty coffee + planning block</div>
+              <div class="event-desc">Use this quiet slot to confirm bookings and map the afternoon.</div>
+            </div>
+          </div>
+          <div class="event">
+            <span class="event-time">11:00</span>
+            <div class="event-content">
+              <div class="event-category"><div class="event-dot dot-joint"></div><span class="event-cat-label">Together</span></div>
+              <div class="event-title">Primary attraction window</div>
+              <div class="event-desc">Ideal slot for Louvre, Musée d'Orsay, or Sainte-Chapelle.</div>
+              <div class="event-note">Book timed entry in advance for major sites.</div>
+            </div>
+          </div>
+          <div class="event">
+            <span class="event-time">16:00</span>
+            <div class="event-content">
+              <div class="event-category"><div class="event-dot dot-solo"></div><span class="event-cat-label">Solo</span></div>
+              <div class="event-title">Open exploration block</div>
+              <div class="event-desc">Wander Le Marais, Canal Saint-Martin, or Palais Royal depending on mood.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="day-card" data-day="2">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-number">Day 3</span>
+      <div class="day-title-block">
+        <div class="day-date">Flex Day</div>
+        <div class="day-name">Day Trip or Recovery</div>
+      </div>
+      <span class="day-tag">Flexible</span>
+      <div class="day-chevron"></div>
+    </div>
+    <div class="day-body">
+      <div class="day-body-inner">
+        <div class="events-timeline">
+          <div class="event">
+            <span class="event-time">Morning</span>
+            <div class="event-content">
+              <div class="event-category"><div class="event-dot dot-joint"></div><span class="event-cat-label">Together</span></div>
+              <div class="event-title">Versailles / Giverny / Montmartre focus</div>
+              <div class="event-desc">Choose one anchor outing and build the rest of the day around it.</div>
+            </div>
+          </div>
+          <div class="event">
+            <span class="event-time">Afternoon</span>
+            <div class="event-content">
+              <div class="event-category"><div class="event-dot dot-strength"></div><span class="event-cat-label">Strength</span></div>
+              <div class="event-title">Hotel gym or bodyweight circuit</div>
+              <div class="event-desc">Simple 30–45 min session to maintain momentum while traveling.</div>
+            </div>
+          </div>
+          <div class="event">
+            <span class="event-time">Evening</span>
+            <div class="event-content">
+              <div class="event-category"><div class="event-dot dot-food"></div><span class="event-cat-label">Food</span></div>
+              <div class="event-title">Memorable dinner reservation</div>
+              <div class="event-desc">Pick one intentional dinner where ambiance matters.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note-card">
+    <h3>Customization checklist</h3>
+    <ul>
+      <li>Replace all placeholder day labels with exact dates</li>
+      <li>Add your confirmed hotels and check-in/check-out times</li>
+      <li>Mark any fixed meetings or calls first, then fit sightseeing around them</li>
+      <li>Pre-book high-demand attractions before finalizing daily order</li>
+      <li>Leave one open block per day for spontaneous exploration</li>
+    </ul>
+  </div>
+</main>
+
+<script>
+function toggleDay(header) {
+  const card = header.parentElement;
+  const isActive = card.classList.contains('active');
+
+  document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
+
+  if (!isActive) {
+    card.classList.add('active');
+    setTimeout(() => {
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  }
+}
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => {
+        entry.target.classList.add('visible');
+      }, 50);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.day-card, .note-card, .legend').forEach(el => {
+  observer.observe(el);
+});
+
+setTimeout(() => {
+  const firstCard = document.querySelector('.day-card');
+  if (firstCard) firstCard.classList.add('active');
+}, 800);
+</script>
+</body>
+</html>
