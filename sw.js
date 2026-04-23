@@ -1,12 +1,21 @@
 // KEVU service worker — app shell cache for offline use.
-const VERSION = 'kevu-v1';
+const VERSION = 'kevu-v2';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './app.js',
   './manifest.webmanifest',
-  './icons/icon.svg'
+  './icons/icon.svg',
+  './src/util.js',
+  './src/store.js',
+  './src/cloud.js',
+  './src/strava.js',
+  './src/views/dashboard.js',
+  './src/views/activity.js',
+  './src/views/habits.js',
+  './src/views/trends.js',
+  './src/views/settings.js'
 ];
 
 self.addEventListener('install', (event) => {
