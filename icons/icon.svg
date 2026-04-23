@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="0.5" cy="0.35" r="0.8">
+      <stop offset="0" stop-color="#1b1b22"/>
+      <stop offset="1" stop-color="#0a0a0c"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- Three concentric arcs: Move / Exercise / Stand -->
+  <g fill="none" stroke-linecap="round" stroke-width="28" transform="translate(256 256)">
+    <circle r="150" stroke="#ff2d55" stroke-opacity="0.18"/>
+    <circle r="150" stroke="#ff2d55" stroke-dasharray="720 1000" transform="rotate(-90)"/>
+
+    <circle r="114" stroke="#b7ff3f" stroke-opacity="0.18"/>
+    <circle r="114" stroke="#b7ff3f" stroke-dasharray="560 800" transform="rotate(-90)"/>
+
+    <circle r="78"  stroke="#00e0ff" stroke-opacity="0.18"/>
+    <circle r="78"  stroke="#00e0ff" stroke-dasharray="360 600" transform="rotate(-90)"/>
+  </g>
+  <!-- Flame mark -->
+  <g transform="translate(256 256)">
+    <path d="M0 -40 C 28 -18 40 2 40 22 C 40 46 22 62 0 62 C -22 62 -40 46 -40 22 C -40 2 -22 -14 -14 -22 C -10 -12 -8 -4 0 -4 C 8 -4 12 -16 0 -40 Z"
+          fill="#d8fe3a"/>
+  </g>
+</svg>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<meta name="theme-color" content="#0a0a0c" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="KEVU" />
+<meta name="description" content="KEVU — a minimalist fitness & habit tracker that works with or without a smartwatch, and syncs from Strava." />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+<link rel="stylesheet" href="styles.css" />
+<title>KEVU — Fitness & Habits</title>
+</head>
+<body>
+
+<main id="app" class="view-host"></main>
+
+<nav class="tab-bar" id="tabBar">
+  <button class="tab active" data-tab="dashboard" aria-label="Dashboard">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+    <span>Dashboard</span>
+  </button>
+  <button class="tab" data-tab="activity" aria-label="Activity">
+    <svg viewBox="0 0 24 24"><path d="M4 16 L9 10 L13 14 L20 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 6 L20 6 L20 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Activity</span>
+  </button>
+  <button class="tab" data-tab="habits" aria-label="Habits">
+    <svg viewBox="0 0 24 24"><path d="M5 12 L10 17 L19 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Habits</span>
+  </button>
+  <button class="tab" data-tab="trends" aria-label="Trends">
+    <svg viewBox="0 0 24 24"><rect x="4" y="13" width="3" height="7" fill="currentColor"/><rect x="10.5" y="8" width="3" height="12" fill="currentColor"/><rect x="17" y="4" width="3" height="16" fill="currentColor"/></svg>
+    <span>Trends</span>
+  </button>
+  <button class="tab" data-tab="settings" aria-label="Settings">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    <span>Settings</span>
+  </button>
+</nav>
+
+<div id="toast" class="toast" aria-live="polite"></div>
+
+<dialog id="sheet" class="sheet"></dialog>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
