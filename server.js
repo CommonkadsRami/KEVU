@@ -52,6 +52,7 @@ function getSession(req, res) {
     const sameSite = isHttps ? 'None' : 'Lax';
     const secure = isHttps ? '; Secure' : '';
     res.setHeader('Set-Cookie', `sid=${sid}; HttpOnly; Path=/; SameSite=${sameSite}${secure}`);
+    res.setHeader('Set-Cookie', `sid=${sid}; HttpOnly; Path=/; SameSite=Lax`);
   }
   return sessions.get(sid);
 }

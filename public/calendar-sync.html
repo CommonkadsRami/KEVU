@@ -30,3 +30,92 @@ syncBtn.onclick=async()=>{const r=await fetch(api('/sync'),{method:'POST',creden
 document.getElementById('clearLog').onclick=()=>logEl.innerHTML='';
 apiBaseInput.value=getBase(); if(q.get('connected'))log(`OAuth connected: ${q.get('connected')}`); if(q.get('error'))log(`OAuth error: ${q.get('error')}`); log('Ready. Connect both providers, then sync.'); Promise.all([refreshConfig(),refreshStatus()]).catch(e=>log(e.message));
 </script></body></html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendar Bridge — Live Sync</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0;min-height:100vh;font-family:Inter,system-ui,sans-serif;background:#0b1020;color:#e8ecff;display:grid;place-items:center;padding:2rem 1rem}.app{width:min(840px,100%);background:#111831;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:1.4rem 1.4rem 1.6rem}.subtitle{color:#aeb8e3}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;margin-top:1rem}.account{background:#161f3f;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:1rem}.status{margin-top:.6rem;color:#aeb8e3;font-size:.9rem}.actions{margin-top:1rem;display:flex;gap:.75rem;flex-wrap:wrap}button{border:none;background:#6ea8ff;color:#03143a;font-weight:700;border-radius:10px;padding:.75rem 1rem;cursor:pointer}button.secondary{background:transparent;border:1px solid rgba(255,255,255,.2);color:#e8ecff}.log{margin-top:1rem;min-height:130px;max-height:260px;overflow:auto;background:#0c1329;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:.9rem;color:#aeb8e3;font-size:.9rem;line-height:1.5}.hint{margin-top:1rem;color:#aeb8e3;font-size:.82rem}</style>
+</head>
+<body>
+<main class="app">
+  <h1>Calendar Bridge</h1>
+  <p class="subtitle">Real OAuth + real sync (Microsoft 365 ➜ Google Calendar).</p>
+  <p class="subtitle" id="configHint">Checking backend OAuth config...</p>
+
+  <section class="grid">
+    <article class="account">
+      <h2>Work (Microsoft 365)</h2>
+      <div class="status" id="msStatus">Not connected</div>
+      <button id="connectMicrosoft">Connect Microsoft</button>
+    </article>
+    <article class="account">
+      <h2>Personal (Google)</h2>
+      <div class="status" id="googleStatus">Not connected</div>
+      <button id="connectGoogle">Connect Google</button>
+    </article>
+  </section>
+
+  <div class="actions">
+    <button id="syncBtn" disabled>Sync calendars</button>
+    <button id="refreshBtn" class="secondary">Refresh status</button>
+    <button id="clearLog" class="secondary">Clear log</button>
+  </div>
+
+  <div id="log" class="log" aria-live="polite"></div>
+  <p class="hint">This page calls backend endpoints: <code>/auth/microsoft</code>, <code>/auth/google</code>, <code>/auth/status</code>, <code>/sync</code>.</p>
+</main>
+<script>
+const logEl=document.getElementById('log');
+const msStatus=document.getElementById('msStatus');
+const googleStatus=document.getElementById('googleStatus');
+const syncBtn=document.getElementById('syncBtn');
+const configHint=document.getElementById('configHint');
+const q=new URLSearchParams(location.search);
+const appendLog=(m)=>{logEl.innerHTML+=`[${new Date().toLocaleTimeString()}] ${m}<br>`;logEl.scrollTop=logEl.scrollHeight};
+async function refreshStatus(){
+  const res=await fetch('/auth/status',{credentials:'include'});
+  const data=await res.json();
+  msStatus.textContent=data.microsoft.connected?`Connected as ${data.microsoft.email||'Microsoft account'}`:'Not connected';
+  googleStatus.textContent=data.google.connected?`Connected as ${data.google.email||'Google account'}`:'Not connected';
+  syncBtn.disabled=!(data.microsoft.connected&&data.google.connected);
+}
+
+
+async function refreshConfig(){
+  const res=await fetch('/auth/config',{credentials:'include'});
+  const data=await res.json();
+  const missing=[];
+  if(!data.microsoftReady) missing.push('MS_CLIENT_ID/MS_CLIENT_SECRET');
+  if(!data.googleReady) missing.push('GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET');
+  if(missing.length){
+    configHint.textContent=`OAuth not configured. Missing: ${missing.join(', ')}. Add them to .env then restart server.`;
+    appendLog(configHint.textContent);
+  } else {
+    configHint.textContent=`OAuth config OK. Using BASE_URL: ${data.baseUrl}`;
+  }
+}
+
+document.getElementById('connectMicrosoft').onclick=()=>location.href='/auth/microsoft';
+document.getElementById('connectGoogle').onclick=()=>location.href='/auth/google';
+document.getElementById('refreshBtn').onclick=()=>refreshStatus();
+document.getElementById('syncBtn').onclick=async()=>{
+  appendLog('Starting sync...');
+  const res=await fetch('/sync',{method:'POST',credentials:'include'});
+  const data=await res.json();
+  if(!res.ok){appendLog(`Sync failed: ${data.error||'unknown error'}`);return;}
+  appendLog(`Sync complete. Imported ${data.imported} meeting(s).`);
+};
+document.getElementById('clearLog').onclick=()=>logEl.innerHTML='';
+if(q.get('connected')) appendLog(`OAuth connected: ${q.get('connected')}`);
+if(q.get('error')) appendLog(`OAuth error: ${q.get('error')}`);
+appendLog('Ready. Connect both providers, then sync.');
+Promise.all([
+  refreshConfig(),
+  refreshStatus()
+]).catch(()=>appendLog('Could not load backend endpoints. Is server.js running on this URL?'));
+refreshStatus().catch(()=>appendLog('Could not load auth status. Is backend running?'));
+</script>
+</body>
+</html>
