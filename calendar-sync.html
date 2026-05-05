@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendar Bridge — Live Sync</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0;min-height:100vh;font-family:Inter,system-ui,sans-serif;background:#0b1020;color:#e8ecff;display:grid;place-items:center;padding:2rem 1rem}.app{width:min(900px,100%);background:#111831;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:1.4rem}.subtitle{color:#aeb8e3}.row{display:flex;gap:.65rem;flex-wrap:wrap;margin:.65rem 0 1rem}.grow{flex:1}input,button{border-radius:10px;padding:.7rem .9rem;font-size:.95rem}input{border:1px solid rgba(255,255,255,.2);background:#0c1329;color:#d6ddff}button{border:none;background:#6ea8ff;color:#03143a;font-weight:700;cursor:pointer}button.secondary{background:transparent;border:1px solid rgba(255,255,255,.2);color:#e8ecff}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem}.account{background:#161f3f;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:1rem}.status{margin-top:.6rem;color:#aeb8e3}.actions{margin-top:1rem;display:flex;gap:.75rem;flex-wrap:wrap}.log{margin-top:1rem;min-height:130px;max-height:260px;overflow:auto;background:#0c1329;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:.9rem;color:#aeb8e3;line-height:1.5}</style>
+</head><body><main class="app">
+<h1>Calendar Bridge</h1><p class="subtitle">Real OAuth + real sync (Microsoft 365 ➜ Google Calendar).</p>
+<p class="subtitle" id="configHint">Set backend URL if this page is hosted statically (Netlify/Vercel).</p>
+<div class="row"><input id="apiBase" class="grow" placeholder="https://your-backend.example.com (leave empty for same origin)"><button id="saveBase">Save backend URL</button></div>
+<section class="grid"><article class="account"><h2>Work (Microsoft 365)</h2><div id="msStatus" class="status">Not connected</div><button id="connectMicrosoft">Connect Microsoft</button></article><article class="account"><h2>Personal (Google)</h2><div id="googleStatus" class="status">Not connected</div><button id="connectGoogle">Connect Google</button></article></section>
+<div class="actions"><button id="syncBtn" disabled>Sync calendars</button><button id="refreshBtn" class="secondary">Refresh status</button><button id="clearLog" class="secondary">Clear log</button></div>
+<div id="log" class="log" aria-live="polite"></div></main>
+<script>
+const q=new URLSearchParams(location.search),logEl=document.getElementById('log');
+const msStatus=document.getElementById('msStatus'),googleStatus=document.getElementById('googleStatus'),syncBtn=document.getElementById('syncBtn');
+const apiBaseInput=document.getElementById('apiBase');
+const log=t=>{logEl.innerHTML+=`[${new Date().toLocaleTimeString()}] ${t}<br>`;logEl.scrollTop=logEl.scrollHeight};
+const getBase=()=>localStorage.getItem('calendarBridgeApiBase')||''; const setBase=v=>localStorage.setItem('calendarBridgeApiBase',v.replace(/\/$/,''));
+const base=()=>getBase()||''; const api=p=>`${base()}${p}`;
+async function refreshStatus(){const r=await fetch(api('/auth/status'),{credentials:'include'});const d=await r.json();msStatus.textContent=d.microsoft.connected?`Connected as ${d.microsoft.email||'Microsoft account'}`:'Not connected';googleStatus.textContent=d.google.connected?`Connected as ${d.google.email||'Google account'}`:'Not connected';syncBtn.disabled=!(d.microsoft.connected&&d.google.connected)}
+async function refreshConfig(){try{const r=await fetch(api('/auth/config'),{credentials:'include'});const d=await r.json();const missing=[];if(!d.microsoftReady)missing.push('MS_CLIENT_ID/MS_CLIENT_SECRET');if(!d.googleReady)missing.push('GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET');document.getElementById('configHint').textContent=missing.length?`OAuth not configured on backend. Missing: ${missing.join(', ')}`:`OAuth backend reachable at ${base()||location.origin}`;}catch{document.getElementById('configHint').textContent=`Cannot reach backend at ${base()||location.origin}. If this is Netlify, set your backend URL above.`;throw new Error('backend unreachable')}}
+document.getElementById('saveBase').onclick=()=>{setBase(apiBaseInput.value.trim());log(`Saved backend URL: ${base()||location.origin}`);Promise.all([refreshConfig(),refreshStatus()]).catch(e=>log(e.message));};
+document.getElementById('connectMicrosoft').onclick=()=>location.href=api('/auth/microsoft');
+document.getElementById('connectGoogle').onclick=()=>location.href=api('/auth/google');
+document.getElementById('refreshBtn').onclick=()=>Promise.all([refreshConfig(),refreshStatus()]).catch(e=>log(e.message));
+syncBtn.onclick=async()=>{const r=await fetch(api('/sync'),{method:'POST',credentials:'include'});const d=await r.json();if(!r.ok)return log(`Sync failed: ${d.error||'unknown'}`);log(`Sync complete. Imported ${d.imported} meeting(s).`)};
+document.getElementById('clearLog').onclick=()=>logEl.innerHTML='';
+apiBaseInput.value=getBase(); if(q.get('connected'))log(`OAuth connected: ${q.get('connected')}`); if(q.get('error'))log(`OAuth error: ${q.get('error')}`); log('Ready. Connect both providers, then sync.'); Promise.all([refreshConfig(),refreshStatus()]).catch(e=>log(e.message));
+</script></body></html>
