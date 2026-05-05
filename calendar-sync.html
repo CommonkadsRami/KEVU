@@ -86,6 +86,256 @@ Promise.all([
   refreshConfig(),
   refreshStatus()
 ]).catch(()=>appendLog('Could not load backend endpoints. Is server.js running on this URL?'));
+refreshStatus().catch(()=>appendLog('Could not load auth status. Is backend running?'));
+<title>Calendar Bridge — Work + Personal Sync</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b1020;
+    --bg-soft: #111831;
+    --card: #161f3f;
+    --text: #e8ecff;
+    --text-dim: #aeb8e3;
+    --primary: #6ea8ff;
+    --primary-strong: #4f8dff;
+    --border: rgba(255,255,255,0.12);
+    --ok: #22c55e;
+    --warn: #f59e0b;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(circle at 0% 0%, #1e2c63 0%, transparent 40%),
+      radial-gradient(circle at 100% 100%, #0e5e72 0%, transparent 42%),
+      var(--bg);
+    display: grid;
+    place-items: center;
+    padding: 2rem 1rem;
+  }
+
+  .app {
+    width: min(760px, 100%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent), var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: clamp(1.25rem, 2.5vw, 2rem);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .subtitle {
+    margin-top: 0.6rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  .grid {
+    margin-top: 1.2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1rem;
+  }
+
+  .account {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem;
+  }
+
+  .account h2 {
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  .account p {
+    margin: 0.5rem 0 0;
+    color: var(--text-dim);
+    font-size: 0.92rem;
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.75rem;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--warn);
+  }
+
+  .dot.connected { background: var(--ok); }
+
+  .actions {
+    margin-top: 1.2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  button {
+    appearance: none;
+    border: none;
+    background: var(--primary);
+    color: #03143a;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    transition: transform 0.15s ease, background 0.2s;
+  }
+
+  button:hover { background: var(--primary-strong); transform: translateY(-1px); }
+  button:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+  .button-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .log {
+    margin-top: 1rem;
+    background: #0c1329;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.9rem;
+    min-height: 130px;
+    max-height: 220px;
+    overflow: auto;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text-dim);
+  }
+
+  .hint {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  code { color: #c7d6ff; }
+</style>
+</head>
+<body>
+  <main class="app">
+    <h1>Calendar Bridge</h1>
+    <p class="subtitle">Connect Outlook + Teams Calendar with Google Calendar and sync work meetings into your personal calendar with one click.</p>
+
+    <section class="grid">
+      <article class="account">
+        <h2>Work (Microsoft 365)</h2>
+        <p>Outlook Mail + Teams Calendar</p>
+        <div class="status"><span id="msDot" class="dot"></span><span id="msState">Not connected</span></div>
+      </article>
+
+      <article class="account">
+        <h2>Personal (Google)</h2>
+        <p>Gmail + Google Calendar</p>
+        <div class="status"><span id="googleDot" class="dot"></span><span id="googleState">Not connected</span></div>
+      </article>
+    </section>
+
+    <div class="actions">
+      <button id="connectMicrosoft">Connect Microsoft</button>
+      <button id="connectGoogle">Connect Google</button>
+      <button id="syncBtn" disabled>Sync calendars</button>
+      <button id="clearLog" class="button-secondary">Clear log</button>
+    </div>
+
+    <div id="log" class="log" aria-live="polite"></div>
+
+    <p class="hint">Implementation note: this UI is wired for OAuth + API calls. Replace the mock handlers in <code>&lt;script&gt;</code> with your backend endpoints (<code>/auth/microsoft</code>, <code>/auth/google</code>, <code>/sync</code>).</p>
+  </main>
+
+<script>
+(() => {
+  const state = {
+    microsoftConnected: false,
+    googleConnected: false,
+    syncing: false
+  };
+
+  const logEl = document.getElementById('log');
+  const msDot = document.getElementById('msDot');
+  const msState = document.getElementById('msState');
+  const googleDot = document.getElementById('googleDot');
+  const googleState = document.getElementById('googleState');
+  const syncBtn = document.getElementById('syncBtn');
+
+  const appendLog = (text) => {
+    const timestamp = new Date().toLocaleTimeString();
+    logEl.innerHTML += `[${timestamp}] ${text}<br>`;
+    logEl.scrollTop = logEl.scrollHeight;
+  };
+
+  const refreshUi = () => {
+    msDot.classList.toggle('connected', state.microsoftConnected);
+    googleDot.classList.toggle('connected', state.googleConnected);
+    msState.textContent = state.microsoftConnected ? 'Connected' : 'Not connected';
+    googleState.textContent = state.googleConnected ? 'Connected' : 'Not connected';
+    syncBtn.disabled = !(state.microsoftConnected && state.googleConnected) || state.syncing;
+  };
+
+  const fakeWait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  document.getElementById('connectMicrosoft').addEventListener('click', async () => {
+    appendLog('Starting Microsoft connection...');
+    await fakeWait(700);
+    state.microsoftConnected = true;
+    refreshUi();
+    appendLog('Microsoft account connected.');
+  });
+
+  document.getElementById('connectGoogle').addEventListener('click', async () => {
+    appendLog('Starting Google connection...');
+    await fakeWait(700);
+    state.googleConnected = true;
+    refreshUi();
+    appendLog('Google account connected.');
+  });
+
+  syncBtn.addEventListener('click', async () => {
+    state.syncing = true;
+    refreshUi();
+
+    appendLog('Sync started: fetching work events from Outlook/Teams...');
+    await fakeWait(1000);
+    appendLog('Filtering duplicates and private events...');
+    await fakeWait(800);
+    appendLog('Writing meetings into Google Calendar...');
+    await fakeWait(1000);
+    appendLog('Sync complete. Your personal calendar now includes work meetings.');
+
+    state.syncing = false;
+    refreshUi();
+  });
+
+  document.getElementById('clearLog').addEventListener('click', () => {
+    logEl.innerHTML = '';
+  });
+
+  appendLog('Ready. Connect both accounts to enable sync.');
+  refreshUi();
+})();
 </script>
 </body>
 </html>

@@ -86,6 +86,7 @@ Promise.all([
   refreshConfig(),
   refreshStatus()
 ]).catch(()=>appendLog('Could not load backend endpoints. Is server.js running on this URL?'));
+refreshStatus().catch(()=>appendLog('Could not load auth status. Is backend running?'));
 </script>
 </body>
 </html>
