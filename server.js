@@ -3,19 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const envPath = path.join(__dirname, '.env');
-if (fs.existsSync(envPath)) {
-  const envText = fs.readFileSync(envPath, 'utf8');
-  for (const rawLine of envText.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line || line.startsWith('#') || !line.includes('=')) continue;
-    const idx = line.indexOf('=');
-    const key = line.slice(0, idx).trim();
-    const value = line.slice(idx + 1).trim();
-    if (!process.env[key]) process.env[key] = value;
-  }
-}
-
 const PORT = process.env.PORT || 3000;
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
@@ -153,14 +140,6 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, {
         microsoft: { connected: !!session.microsoft, email: session.microsoft?.email || null },
         google: { connected: !!session.google, email: session.google?.email || null }
-      });
-    }
-
-    if (req.method === 'GET' && url.pathname === '/auth/config') {
-      return sendJson(res, 200, {
-        microsoftReady: !!(process.env.MS_CLIENT_ID && process.env.MS_CLIENT_SECRET),
-        googleReady: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
-        baseUrl: BASE_URL
       });
     }
 

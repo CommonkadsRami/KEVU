@@ -13,7 +13,6 @@
 <main class="app">
   <h1>Calendar Bridge</h1>
   <p class="subtitle">Real OAuth + real sync (Microsoft 365 ➜ Google Calendar).</p>
-  <p class="subtitle" id="configHint">Checking backend OAuth config...</p>
 
   <section class="grid">
     <article class="account">
@@ -42,7 +41,6 @@ const logEl=document.getElementById('log');
 const msStatus=document.getElementById('msStatus');
 const googleStatus=document.getElementById('googleStatus');
 const syncBtn=document.getElementById('syncBtn');
-const configHint=document.getElementById('configHint');
 const q=new URLSearchParams(location.search);
 const appendLog=(m)=>{logEl.innerHTML+=`[${new Date().toLocaleTimeString()}] ${m}<br>`;logEl.scrollTop=logEl.scrollHeight};
 async function refreshStatus(){
@@ -51,21 +49,6 @@ async function refreshStatus(){
   msStatus.textContent=data.microsoft.connected?`Connected as ${data.microsoft.email||'Microsoft account'}`:'Not connected';
   googleStatus.textContent=data.google.connected?`Connected as ${data.google.email||'Google account'}`:'Not connected';
   syncBtn.disabled=!(data.microsoft.connected&&data.google.connected);
-}
-
-
-async function refreshConfig(){
-  const res=await fetch('/auth/config',{credentials:'include'});
-  const data=await res.json();
-  const missing=[];
-  if(!data.microsoftReady) missing.push('MS_CLIENT_ID/MS_CLIENT_SECRET');
-  if(!data.googleReady) missing.push('GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET');
-  if(missing.length){
-    configHint.textContent=`OAuth not configured. Missing: ${missing.join(', ')}. Add them to .env then restart server.`;
-    appendLog(configHint.textContent);
-  } else {
-    configHint.textContent=`OAuth config OK. Using BASE_URL: ${data.baseUrl}`;
-  }
 }
 
 document.getElementById('connectMicrosoft').onclick=()=>location.href='/auth/microsoft';
@@ -82,10 +65,7 @@ document.getElementById('clearLog').onclick=()=>logEl.innerHTML='';
 if(q.get('connected')) appendLog(`OAuth connected: ${q.get('connected')}`);
 if(q.get('error')) appendLog(`OAuth error: ${q.get('error')}`);
 appendLog('Ready. Connect both providers, then sync.');
-Promise.all([
-  refreshConfig(),
-  refreshStatus()
-]).catch(()=>appendLog('Could not load backend endpoints. Is server.js running on this URL?'));
+refreshStatus().catch(()=>appendLog('Could not load auth status. Is backend running?'));
 </script>
 </body>
 </html>
