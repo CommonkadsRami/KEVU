@@ -33,3 +33,7 @@ Open: `http://localhost:3000/calendar-sync.html`
 ## Notes
 - Sync currently imports meetings from the next 7 days from Microsoft calendar to Google primary calendar.
 - Tokens are stored in memory for the current server process.
+
+
+## Netlify frontend + separate backend
+If frontend is on Netlify and backend is elsewhere, set `FRONTEND_ORIGIN` to your Netlify URL and use HTTPS on backend so cross-site cookies work (`SameSite=None; Secure`).

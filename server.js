@@ -19,6 +19,20 @@ if (fs.existsSync(envPath)) {
 const PORT = process.env.PORT || 3000;
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || '';
+
+function applyCors(req, res) {
+  const origin = req.headers.origin;
+  if (!origin) return;
+  if (!FRONTEND_ORIGIN || FRONTEND_ORIGIN === origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  }
+}
+
 const sessions = new Map();
 
 function parseCookies(cookieHeader = '') {
@@ -34,6 +48,10 @@ function getSession(req, res) {
   if (!sid || !sessions.has(sid)) {
     sid = crypto.randomBytes(24).toString('hex');
     sessions.set(sid, {});
+    const isHttps = BASE_URL.startsWith('https://');
+    const sameSite = isHttps ? 'None' : 'Lax';
+    const secure = isHttps ? '; Secure' : '';
+    res.setHeader('Set-Cookie', `sid=${sid}; HttpOnly; Path=/; SameSite=${sameSite}${secure}`);
     res.setHeader('Set-Cookie', `sid=${sid}; HttpOnly; Path=/; SameSite=Lax`);
   }
   return sessions.get(sid);
@@ -140,6 +158,8 @@ async function routeSync(req, res, session) {
 
 const server = http.createServer(async (req, res) => {
   try {
+    applyCors(req, res);
+    if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
     const url = new URL(req.url, BASE_URL);
     const session = getSession(req, res);
 
