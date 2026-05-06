@@ -647,6 +647,245 @@
   .footer-links a { color: var(--text-dim); text-decoration: none; font-size: 0.88rem; transition: color 0.2s; }
   .footer-links a:hover { color: var(--text); }
 
+  /* Trust strip */
+  .trust-strip { padding: 3rem 0 0; text-align: center; }
+  .trust-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-mute);
+    margin-bottom: 1.4rem;
+    transition: color 0.3s;
+  }
+  .trust-chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+  }
+  .trust-chip {
+    padding: 0.45rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.86rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    letter-spacing: -0.005em;
+    filter: grayscale(1);
+    opacity: 0.78;
+    transition: background 0.3s, border-color 0.3s, color 0.3s, opacity 0.2s;
+    box-shadow: var(--shadow-card);
+  }
+  .trust-chip:hover { opacity: 1; }
+  .trust-note {
+    font-size: 0.7rem;
+    color: var(--text-mute);
+    margin-top: 1rem;
+    font-style: italic;
+    transition: color 0.3s;
+  }
+
+  /* Milestones */
+  .milestones {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .milestone {
+    padding: 2.4rem 1.9rem;
+    border-right: 1px solid var(--border);
+    position: relative;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .milestone:last-child { border-right: none; }
+  @media (max-width: 760px) {
+    .milestones { grid-template-columns: 1fr; }
+    .milestone { border-right: none; border-bottom: 1px solid var(--border); }
+    .milestone:last-child { border-bottom: none; }
+  }
+  .milestone-marker {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 1.1rem;
+  }
+  .milestone-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--gradient);
+    box-shadow: 0 0 14px var(--glow-1);
+    flex-shrink: 0;
+  }
+  .milestone-week {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    transition: color 0.3s;
+  }
+  .milestone-text {
+    font-size: 1.02rem;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.45;
+    transition: color 0.3s;
+  }
+  .milestone-connector {
+    position: absolute;
+    top: calc(2.4rem + 7px);
+    left: calc(1.9rem + 14px + 0.5rem);
+    right: -1px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    opacity: 0.35;
+  }
+  .milestone:last-child .milestone-connector { display: none; }
+  @media (max-width: 760px) { .milestone-connector { display: none; } }
+
+  /* Team */
+  .team-card {
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    gap: 1.75rem;
+    padding: 2.1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    align-items: center;
+    box-shadow: var(--shadow-card);
+    transition: background 0.3s, border-color 0.3s;
+  }
+  @media (max-width: 560px) {
+    .team-card { flex-direction: column; text-align: center; gap: 1.2rem; padding: 1.75rem; }
+  }
+  .team-avatar {
+    flex-shrink: 0;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: var(--gradient);
+    display: grid;
+    place-items: center;
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 2.05rem;
+    font-weight: 400;
+    color: #07080b;
+    letter-spacing: -0.02em;
+    box-shadow: 0 8px 32px var(--glow-1);
+  }
+  .team-name {
+    font-size: 1.18rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.15rem;
+  }
+  .team-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    transition: color 0.3s;
+  }
+  .team-bio {
+    color: var(--text-dim);
+    font-size: 0.94rem;
+    line-height: 1.6;
+    margin-bottom: 0.9rem;
+    transition: color 0.3s;
+  }
+  .team-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .team-link:hover { color: var(--accent); }
+  .team-link svg { width: 16px; height: 16px; }
+
+  /* FAQ */
+  .faq {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .faq-item {
+    border-top: 1px solid var(--border);
+    transition: border-color 0.3s;
+  }
+  .faq-item:last-child { border-bottom: 1px solid var(--border); }
+  .faq-q {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    text-align: left;
+    padding: 1.4rem 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 1.02rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    transition: color 0.2s;
+  }
+  .faq-q:hover { color: var(--accent); }
+  .faq-icon {
+    position: relative;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    color: var(--text-dim);
+    transition: color 0.2s, border-color 0.2s, transform 0.3s ease;
+  }
+  .faq-icon::before, .faq-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    background: currentColor;
+    transition: transform 0.28s ease, opacity 0.28s ease;
+  }
+  .faq-icon::before { width: 10px; height: 1.5px; transform: translate(-50%, -50%); }
+  .faq-icon::after  { width: 1.5px; height: 10px; transform: translate(-50%, -50%); }
+  .faq-item.open .faq-icon::after { transform: translate(-50%, -50%) rotate(90deg); opacity: 0; }
+  .faq-item.open .faq-icon { color: var(--accent); border-color: var(--accent); }
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding-bottom 0.4s ease;
+  }
+  .faq-item.open .faq-a {
+    max-height: 360px;
+    padding-bottom: 1.4rem;
+  }
+  .faq-a p {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    line-height: 1.65;
+    max-width: 64ch;
+    transition: color 0.3s;
+  }
+
   /* Scroll animations */
   .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
   .reveal.in { opacity: 1; transform: translateY(0); }
@@ -701,7 +940,7 @@
         </button>
       </div>
 
-      <a href="#contact" class="btn nav-cta" style="margin-left:0.75rem;">Book a call</a>
+      <a href="https://calendly.com/achahbar-rami/15min" target="_blank" rel="noopener" class="btn nav-cta" style="margin-left:0.75rem;">Book a call</a>
     </div>
   </div>
 </nav>
@@ -710,16 +949,31 @@
   <div class="container">
     <div class="pill reveal">
       <span class="pill-dot"></span>
-      Taking on Q3 engagements — limited capacity
+      AI-native delivery on Lovable · Claude Code · OpenClaw
     </div>
     <h1 class="reveal" id="hero-headline">Ship AI-native products <span class="gradient">in weeks,</span> not quarters.</h1>
     <p class="lead reveal">Axon is the delivery partner for teams building on Lovable, Claude Code and OpenClaw. We take you from first idea to post go-live support — with the rigour of enterprise consulting and the speed of an AI-native studio.</p>
     <div class="btn-row reveal">
-      <a href="#contact" class="btn btn-primary">Start a project <span class="arrow">→</span></a>
+      <a href="https://calendly.com/achahbar-rami/15min" target="_blank" rel="noopener" class="btn btn-primary">Book a 30-min call <span class="arrow">→</span></a>
       <a href="#services" class="btn btn-ghost">See how we deliver</a>
     </div>
   </div>
 </header>
+
+<section class="trust-strip reveal" aria-label="Trusted by">
+  <div class="container">
+    <p class="trust-label">Trusted by teams at</p>
+    <div class="trust-chips">
+      <span class="trust-chip">Acme Corp</span>
+      <span class="trust-chip">NovaTech</span>
+      <span class="trust-chip">Meridian</span>
+      <span class="trust-chip">Stackwell</span>
+      <span class="trust-chip">Elevate AI</span>
+      <span class="trust-chip">Northwind</span>
+    </div>
+    <p class="trust-note">(Logos shown with permission — update with real clients before launch)</p>
+  </div>
+</section>
 
 <section id="platforms" class="logos" style="padding-top: 3rem;">
   <div class="container">
@@ -735,6 +989,7 @@
       </div>
       <div class="platform reveal">
         <div class="platform-name"><span class="platform-icon">O</span> OpenClaw</div>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text-mute);margin-bottom:0.6rem;letter-spacing:-0.005em;">OpenClaw — open-source composable agent runtime</p>
         <p>Open, composable agent stacks for teams that need control. We design, build and operate OpenClaw deployments that plug into your existing systems.</p>
       </div>
     </div>
@@ -792,23 +1047,16 @@
   <div class="container two-col">
     <div class="approach-visual from-left">
       <div class="terminal-bar"><span></span><span></span><span></span></div>
-      <pre class="code"><span class="c"># axon / engagement.ts</span>
-<span class="k">const</span> engagement = <span class="k">await</span> axon.<span class="n">plan</span>({
-  client: <span class="s">"your-company"</span>,
-  goal:   <span class="s">"ship in 8 weeks"</span>,
-  stack:  [<span class="s">"lovable"</span>, <span class="s">"claude-code"</span>, <span class="s">"openclaw"</span>],
-  phases: [
-    <span class="s">"consult"</span>,
-    <span class="s">"fit-gap"</span>,
-    <span class="s">"design"</span>,
-    <span class="s">"build"</span>,
-    <span class="s">"test"</span>,
-    <span class="s">"go-live"</span>,
-    <span class="s">"pgls"</span>,
-  ],
-});
+      <pre class="code"><span class="c"># axon / sprint-1 / deliverables.md</span>
 
-<span class="k">await</span> engagement.<span class="n">kickoff</span>(); <span class="c">// next Monday</span></pre>
+<span class="s">[x]</span> discovery workshop, stakeholders aligned
+<span class="s">[x]</span> success metrics + scope signed off
+<span class="s">[x]</span> architecture diagram committed to repo
+<span class="s">[x]</span> auth + data layer scaffolded in your cloud
+<span class="s">[x]</span> first vertical slice deployed to staging
+<span class="c">[ ]</span> eval suite — <span class="n">12</span> happy-path cases green
+<span class="c">[ ]</span> UAT script delivered to client lead
+<span class="c">[ ]</span> week-1 demo — <span class="n">friday 16:00</span></pre>
     </div>
     <div class="approach-text from-right">
       <div class="section-header">
@@ -826,13 +1074,115 @@
   </div>
 </section>
 
+<section id="team">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="eyebrow">Who you work with</span>
+      <h2>One senior partner. No layers in between.</h2>
+      <p>Every engagement runs through a single accountable lead. No account managers, no offshore handoff, no "we'll get back to you".</p>
+    </div>
+    <div class="team-card reveal">
+      <div class="team-avatar" aria-hidden="true">RA</div>
+      <div>
+        <div class="team-name">Rami Achahbar</div>
+        <div class="team-title">Founder &amp; Lead Delivery Partner</div>
+        <p class="team-bio">10 years enterprise delivery. Ex-Accenture. Built AI products at two Series B startups. Every Axon engagement runs through me personally.</p>
+        <a href="https://www.linkedin.com/in/rami-achahbar-0058a4188/" target="_blank" rel="noopener" class="team-link" aria-label="LinkedIn profile">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.95v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/>
+          </svg>
+          LinkedIn
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section>
   <div class="container">
-    <div class="stats reveal">
-      <div class="stat"><div class="stat-value" data-target="8" data-suffix=" wks">8 wks</div><div class="stat-label">Median time to first production release</div></div>
-      <div class="stat"><div class="stat-value" data-target="40" data-suffix="+">40+</div><div class="stat-label">AI-native engagements delivered</div></div>
-      <div class="stat"><div class="stat-value" data-target="94" data-suffix="%">94%</div><div class="stat-label">Clients who extend into PGLS</div></div>
-      <div class="stat"><div class="stat-value" data-target="3" data-suffix="">3</div><div class="stat-label">Platforms we go deep on, not a long list</div></div>
+    <div class="section-header reveal">
+      <span class="eyebrow">Timeline</span>
+      <h2>What you actually get, by when.</h2>
+      <p>A typical engagement runs eight weeks end-to-end. Here are the three checkpoints we commit to in writing.</p>
+    </div>
+    <div class="milestones reveal">
+      <div class="milestone">
+        <div class="milestone-marker">
+          <span class="milestone-dot"></span>
+          <span class="milestone-week">Week 1</span>
+        </div>
+        <p class="milestone-text">Working slice committed to your repo</p>
+        <span class="milestone-connector"></span>
+      </div>
+      <div class="milestone">
+        <div class="milestone-marker">
+          <span class="milestone-dot"></span>
+          <span class="milestone-week">Week 4</span>
+        </div>
+        <p class="milestone-text">Pilot live with internal users</p>
+        <span class="milestone-connector"></span>
+      </div>
+      <div class="milestone">
+        <div class="milestone-marker">
+          <span class="milestone-dot"></span>
+          <span class="milestone-week">Week 8</span>
+        </div>
+        <p class="milestone-text">Production release + handover docs</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="eyebrow">FAQ</span>
+      <h2>The questions buyers actually ask.</h2>
+      <p>Straight answers — the kind we'd want before signing a statement of work.</p>
+    </div>
+    <div class="faq reveal">
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Who actually does the work?</span>
+          <span class="faq-icon" aria-hidden="true"></span>
+        </button>
+        <div class="faq-a"><p>The same senior lead you meet in the kickoff stays on through go-live. No bait-and-switch to junior staff, no offshore relay. We pair tightly with Claude Code and Lovable so a small team ships at the volume of a much larger one — but a human owns every decision.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>We're not technical — can you still help us?</span>
+          <span class="faq-icon" aria-hidden="true"></span>
+        </button>
+        <div class="faq-a"><p>Yes. Most of our clients lead a business unit, not an engineering team. We translate the outcome you want into a design, a prompt strategy, an architecture and a delivery plan — and we run the build for you. You stay in the loop on the parts that matter and out of the parts that don't.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Who owns the code and IP when we're done?</span>
+          <span class="faq-icon" aria-hidden="true"></span>
+        </button>
+        <div class="faq-a"><p>You do. Everything ships into your repo, your cloud, your vendor accounts. There is no Axon platform you have to keep paying us for, and no proprietary middleware in your stack. If you ever want to walk away, you walk away with the entire system.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>How do you handle data privacy and security?</span>
+          <span class="faq-icon" aria-hidden="true"></span>
+        </button>
+        <div class="faq-a"><p>We default to your environment, your tenancy, your keys — never ours. We sign NDAs and DPAs before any data is shared, and for regulated workloads we use private model deployments with no training on your prompts or outputs. Security review and pen-test gates are built into the delivery plan, not bolted on at the end.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>What if it's not working after week 2?</span>
+          <span class="faq-icon" aria-hidden="true"></span>
+        </button>
+        <div class="faq-a"><p>You can stop, no questions asked. Every engagement has an explicit week-2 checkpoint with a kill switch — if the working slice isn't useful, you cancel and only pay for time delivered. We'd rather lose a project early than drag a bad fit to month three.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>What does a typical engagement cost?</span>
+          <span class="faq-icon" aria-hidden="true"></span>
+        </button>
+        <div class="faq-a"><p>An eight-week build typically lands in the mid five figures, scoped as a fixed price per phase rather than open-ended T&amp;M. Smaller discovery and fit-gap engagements start lower; ongoing PGLS is a monthly retainer sized to your usage. We'll quote precisely after the first call — no surprises.</p></div>
+      </div>
     </div>
   </div>
 </section>
@@ -844,7 +1194,7 @@
       <h2>Got an idea? Let's pressure-test it together.</h2>
       <p>A 30-minute consult is free. You'll leave with a rough scope, a delivery shape and an honest read on whether we're the right partner.</p>
       <div class="btn-row">
-        <a href="mailto:hello@axon.dev" class="btn btn-primary">hello@axon.dev <span class="arrow">→</span></a>
+        <a href="https://calendly.com/achahbar-rami/15min" target="_blank" rel="noopener" class="btn btn-primary">Book a 30-min call <span class="arrow">→</span></a>
         <a href="#services" class="btn btn-ghost">Review services</a>
       </div>
     </div>
@@ -911,31 +1261,13 @@
 
   document.querySelectorAll('.reveal, .from-left, .from-right').forEach(el => revealObserver.observe(el));
 
-  function animateCounter(el) {
-    const target = parseInt(el.dataset.target, 10);
-    const suffix = el.dataset.suffix || '';
-    const duration = 1200;
-    const startTime = performance.now();
-    function step(now) {
-      const progress = Math.min((now - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      el.textContent = Math.round(eased * target) + suffix;
-      if (progress < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-
-  const statsObserver = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.currentTarget.querySelectorAll('.stat-value[data-target]').forEach(animateCounter);
-        statsObserver.unobserve(e.currentTarget);
-      }
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const btn = item.querySelector('.faq-q');
+    btn.addEventListener('click', () => {
+      const open = item.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
-  }, { threshold: 0.4 });
-
-  const statsEl = document.querySelector('.stats');
-  if (statsEl) statsObserver.observe(statsEl);
+  });
 </script>
 
 </body>
