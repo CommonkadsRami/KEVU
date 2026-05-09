@@ -295,7 +295,7 @@
   }
 
   .hero {
-    padding: clamp(4rem, 10vw, 8rem) 0 clamp(3rem, 7vw, 6rem);
+    padding: clamp(2rem, 5vw, 4rem) 0 clamp(3rem, 7vw, 6rem);
     text-align: center;
     overflow: hidden;
   }
@@ -886,6 +886,305 @@
     transition: color 0.3s;
   }
 
+  /* Pre-hero problem framing */
+  .pre-hero {
+    text-align: center;
+    padding-top: clamp(3rem, 6vw, 4.5rem);
+    padding-bottom: 0.5rem;
+  }
+  .pre-hero p {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-size: clamp(1.1rem, 1.7vw, 1.35rem);
+    color: var(--text-mute);
+    line-height: 1.55;
+    max-width: 52ch;
+    margin: 0 auto 0.7rem;
+    transition: color 0.3s;
+  }
+  .pre-hero p:last-child { color: var(--text-dim); }
+
+  /* CTA punch line */
+  .cta-punch {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: clamp(1.15rem, 2vw, 1.55rem);
+    color: var(--text-dim);
+    line-height: 1.4;
+    margin: 0 auto 1.75rem;
+    max-width: 42ch;
+    transition: color 0.3s;
+  }
+  .cta-punch strong {
+    color: var(--text);
+    font-style: italic;
+    background: var(--gradient);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 400;
+  }
+
+  /* Hero subhead */
+  .hero-subhead {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+    font-style: italic;
+    color: var(--text-dim);
+    line-height: 1.45;
+    max-width: 56ch;
+    margin: 0 auto 1.4rem;
+    transition: color 0.3s;
+  }
+
+  /* Service pillars */
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+  @media (max-width: 880px) { .pillars { grid-template-columns: 1fr; } }
+
+  .pillar {
+    padding: 2.1rem 1.85rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-card);
+    transition: border-color 0.25s, transform 0.3s cubic-bezier(.22,.68,0,1.2), background 0.3s, box-shadow 0.25s;
+  }
+  .pillar:hover { border-color: var(--border-strong); transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
+
+  .pillar-num {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 3.4rem;
+    font-style: italic;
+    background: var(--gradient);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 0.95;
+    margin-bottom: 0.6rem;
+    letter-spacing: -0.02em;
+  }
+  .pillar-name {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 1.75rem;
+    letter-spacing: -0.015em;
+    margin-bottom: 0.55rem;
+    line-height: 1.1;
+  }
+  .pillar-name .gradient {
+    background: var(--gradient);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-style: italic;
+  }
+  .pillar-tagline {
+    font-size: 0.92rem;
+    color: var(--text-dim);
+    line-height: 1.55;
+    margin-bottom: 1.4rem;
+    transition: color 0.3s;
+  }
+
+  .pillar-stages { list-style: none; border-top: 1px solid var(--border); transition: border-color 0.3s; }
+  .pillar-stages li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1.6rem 1fr;
+    gap: 0.5rem;
+    align-items: baseline;
+    transition: border-color 0.3s;
+  }
+  .pillar-stages .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    transition: color 0.3s;
+  }
+  .pillar-stages .step-name {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 0.92rem;
+    letter-spacing: -0.005em;
+  }
+  .pillar-stages .step-desc {
+    display: block;
+    color: var(--text-dim);
+    font-size: 0.83rem;
+    line-height: 1.5;
+    margin-top: 0.2rem;
+    transition: color 0.3s;
+  }
+
+  .pillar-deliverables { margin-top: 1.4rem; padding-top: 1.2rem; border-top: 1px dashed var(--border-strong); transition: border-color 0.3s; }
+  .pillar-deliverables-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-mute);
+    margin-bottom: 0.65rem;
+    transition: color 0.3s;
+  }
+  .pillar-deliverables-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .pillar-deliverables-list span {
+    font-size: 0.76rem;
+    padding: 0.32rem 0.7rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-dim);
+    transition: background 0.3s, border-color 0.3s, color 0.3s;
+  }
+
+  /* Selected work / case study */
+  .case-card {
+    padding: clamp(1.75rem, 4vw, 2.75rem);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .case-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    transition: border-color 0.3s;
+  }
+  .case-logo {
+    width: 46px;
+    height: 46px;
+    border-radius: 11px;
+    background: var(--gradient);
+    display: grid;
+    place-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: #07080b;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .case-titles { display: flex; flex-direction: column; gap: 0.15rem; }
+  .case-client { font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em; }
+  .case-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    transition: color 0.3s;
+  }
+
+  .case-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 1.75rem;
+  }
+  @media (max-width: 760px) { .case-grid { grid-template-columns: 1fr; gap: 1.4rem; } }
+  .case-block-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-mute);
+    margin-bottom: 0.55rem;
+    transition: color 0.3s;
+  }
+  .case-block p { font-size: 0.92rem; color: var(--text-dim); line-height: 1.6; transition: color 0.3s; }
+
+  .case-outcomes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    transition: border-color 0.3s;
+  }
+  @media (max-width: 760px) { .case-outcomes { grid-template-columns: 1fr; } }
+  .outcome {
+    padding: 1.25rem 1.1rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .outcome-num {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 1.95rem;
+    background: var(--gradient);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+    margin-bottom: 0.45rem;
+  }
+  .outcome-text { font-size: 0.84rem; color: var(--text-dim); line-height: 1.45; transition: color 0.3s; }
+
+  .case-disclaimer {
+    margin-top: 1.6rem;
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--text-mute);
+    font-style: italic;
+    transition: color 0.3s;
+  }
+
+  /* Testimonials */
+  .testimonials {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  @media (max-width: 880px) { .testimonials { grid-template-columns: 1fr; } }
+  .testimonial {
+    padding: 1.75rem 1.6rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .testimonial-quote {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 1.1rem;
+    line-height: 1.45;
+    color: var(--text);
+    letter-spacing: -0.005em;
+    margin-bottom: 1.4rem;
+    flex-grow: 1;
+  }
+  .testimonial-quote::before { content: '“'; color: var(--accent); margin-right: 0.05em; }
+  .testimonial-quote::after  { content: '”'; color: var(--accent); margin-left: 0.05em; }
+  .testimonial-meta { display: flex; align-items: center; gap: 0.75rem; }
+  .testimonial-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--gradient);
+    display: grid;
+    place-items: center;
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 0.95rem;
+    color: #07080b;
+    flex-shrink: 0;
+  }
+  .testimonial-name { font-size: 0.88rem; font-weight: 600; line-height: 1.2; }
+  .testimonial-role { font-size: 0.78rem; color: var(--text-dim); line-height: 1.3; margin-top: 0.15rem; transition: color 0.3s; }
+
   /* Scroll animations */
   .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
   .reveal.in { opacity: 1; transform: translateY(0); }
@@ -916,9 +1215,10 @@
     </a>
     <div class="nav-right">
       <div class="nav-links">
-        <a href="#platforms">Platforms</a>
         <a href="#services">Services</a>
         <a href="#approach">Approach</a>
+        <a href="#work">Work</a>
+        <a href="#faq">FAQ</a>
       </div>
 
       <div class="theme-toggle" role="group" aria-label="Colour theme">
@@ -945,14 +1245,21 @@
   </div>
 </nav>
 
+<div class="pre-hero">
+  <div class="container">
+    <p class="reveal">You bought the AI tools. Sat through the demos. Ran the pilots.</p>
+    <p class="reveal">Six months later, the rollout stalled and nobody can explain the ROI.</p>
+  </div>
+</div>
+
 <header class="hero">
   <div class="container">
     <div class="pill reveal">
       <span class="pill-dot"></span>
-      AI-native delivery on Lovable · Claude Code · OpenClaw
+      Workflow-first AI delivery on Lovable · Claude Code · OpenClaw
     </div>
     <h1 class="reveal" id="hero-headline">Ship AI-native products <span class="gradient">in weeks,</span> not quarters.</h1>
-    <p class="lead reveal">Axon is the delivery partner for teams building on Lovable, Claude Code and OpenClaw. We take you from first idea to post go-live support — with the rigour of enterprise consulting and the speed of an AI-native studio.</p>
+    <p class="lead reveal">We scope what's worth building, build it in your repo, and train your team to run it. End-to-end delivery on Lovable, Claude Code and OpenClaw — the rigour of enterprise consulting at the cadence of a studio.</p>
     <div class="btn-row reveal">
       <a href="https://calendly.com/achahbar-rami/15min" target="_blank" rel="noopener" class="btn btn-primary">Book a 30-min call <span class="arrow">→</span></a>
       <a href="#services" class="btn btn-ghost">See how we deliver</a>
@@ -1000,44 +1307,105 @@
   <div class="container">
     <div class="section-header reveal">
       <span class="eyebrow">Services</span>
-      <h2>A full-lifecycle partner, not a side contractor.</h2>
-      <p>We take ownership from the first whiteboard session to the quarter after go-live. Engage us for one phase or the whole journey.</p>
+      <h2>Every engagement runs on three pillars.</h2>
+      <p>Seven stages compressed into the three things we actually spend our days doing — with named deliverables in your repo at the end of each.</p>
     </div>
-    <div class="lifecycle">
-      <div class="stage reveal">
-        <div class="stage-icon"><svg viewBox="0 0 24 24"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4l1.4-1.4M17 7l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg></div>
-        <h3>Consultation</h3>
-        <p>Short, focused discovery to pressure-test the idea, map stakeholders and surface the real business outcome worth building toward.</p>
+    <div class="pillars">
+      <div class="pillar reveal">
+        <div class="pillar-num">01</div>
+        <div class="pillar-name"><span class="gradient">Discover</span></div>
+        <p class="pillar-tagline">Understand how your team actually works. Find the small set of opportunities worth building.</p>
+        <ul class="pillar-stages">
+          <li>
+            <span class="step-num">a.</span>
+            <div>
+              <span class="step-name">Consultation</span>
+              <span class="step-desc">Pressure-test the idea, map stakeholders, name the business outcome.</span>
+            </div>
+          </li>
+          <li>
+            <span class="step-num">b.</span>
+            <div>
+              <span class="step-name">Fit-Gap Analysis</span>
+              <span class="step-desc">Benchmark your process against Lovable, Claude Code and OpenClaw out of the box; call out where custom work is needed.</span>
+            </div>
+          </li>
+        </ul>
+        <div class="pillar-deliverables">
+          <div class="pillar-deliverables-label">You leave with</div>
+          <div class="pillar-deliverables-list">
+            <span>Opportunity map</span>
+            <span>Fit-gap matrix</span>
+            <span>Success-metric scorecard</span>
+          </div>
+        </div>
       </div>
-      <div class="stage reveal">
-        <div class="stage-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h16"/><path d="M18 10l3 2-3 2"/></svg></div>
-        <h3>Fit-Gap Analysis</h3>
-        <p>We benchmark your process against what Lovable, Claude Code and OpenClaw do well out of the box — and call out where custom work is actually needed.</p>
+
+      <div class="pillar reveal">
+        <div class="pillar-num">02</div>
+        <div class="pillar-name"><span class="gradient">Build</span></div>
+        <p class="pillar-tagline">Ship weekly vertical slices into your repo, with tests and evals as first-class citizens.</p>
+        <ul class="pillar-stages">
+          <li>
+            <span class="step-num">a.</span>
+            <div>
+              <span class="step-name">Design</span>
+              <span class="step-desc">Product, data and agent architecture in one deliverable — flows, prompts, schemas, evals, SLAs.</span>
+            </div>
+          </li>
+          <li>
+            <span class="step-num">b.</span>
+            <div>
+              <span class="step-name">Build</span>
+              <span class="step-desc">Senior engineers pairing with Claude Code, Lovable and OpenClaw — weekly slices, review gates, telemetry baked in.</span>
+            </div>
+          </li>
+          <li>
+            <span class="step-num">c.</span>
+            <div>
+              <span class="step-name">Test</span>
+              <span class="step-desc">LLM eval suites, integration tests, structured UAT. No release without a green board.</span>
+            </div>
+          </li>
+        </ul>
+        <div class="pillar-deliverables">
+          <div class="pillar-deliverables-label">You leave with</div>
+          <div class="pillar-deliverables-list">
+            <span>ADR pack</span>
+            <span>Sprint vertical slices</span>
+            <span>Eval harness</span>
+          </div>
+        </div>
       </div>
-      <div class="stage reveal">
-        <div class="stage-icon"><svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg></div>
-        <h3>Design</h3>
-        <p>Product, data and agent architecture in one deliverable. Clickable flows, prompts, schemas, evals and the SLAs the system must meet.</p>
-      </div>
-      <div class="stage reveal">
-        <div class="stage-icon"><svg viewBox="0 0 24 24"><path d="M8 6l-5 6 5 6M16 6l5 6-5 6M14 4l-4 16"/></svg></div>
-        <h3>Build</h3>
-        <p>Senior engineers pairing with Claude Code, Lovable and OpenClaw to ship in weekly vertical slices — with tests, telemetry and review gates baked in.</p>
-      </div>
-      <div class="stage reveal">
-        <div class="stage-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-        <h3>Test</h3>
-        <p>Automated eval suites for LLM behaviour, integration tests for your stack, and structured UAT with your users. No release without a green board.</p>
-      </div>
-      <div class="stage reveal">
-        <div class="stage-icon"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/><path d="M5 4v16"/></svg></div>
-        <h3>Go-Live</h3>
-        <p>Cutover planning, phased rollout, data migration, comms, training and a war-room through the first business days. We stay in the room.</p>
-      </div>
-      <div class="stage reveal">
-        <div class="stage-icon"><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
-        <h3>Post Go-Live Support (PGLS)</h3>
-        <p>Hypercare, model drift monitoring, continuous improvement and a roadmap that keeps the solution compounding value quarter after quarter.</p>
+
+      <div class="pillar reveal">
+        <div class="pillar-num">03</div>
+        <div class="pillar-name"><span class="gradient">Land</span></div>
+        <p class="pillar-tagline">Get it into production and into your team's hands. Make sure it's still being used in 90 days.</p>
+        <ul class="pillar-stages">
+          <li>
+            <span class="step-num">a.</span>
+            <div>
+              <span class="step-name">Go-Live</span>
+              <span class="step-desc">Cutover planning, phased rollout, data migration, comms, training and a war-room through the first business days.</span>
+            </div>
+          </li>
+          <li>
+            <span class="step-num">b.</span>
+            <div>
+              <span class="step-name">Post Go-Live Support</span>
+              <span class="step-desc">Hypercare, model-drift monitoring, continuous improvement, and a roadmap that keeps compounding value quarter after quarter.</span>
+            </div>
+          </li>
+        </ul>
+        <div class="pillar-deliverables">
+          <div class="pillar-deliverables-label">You leave with</div>
+          <div class="pillar-deliverables-list">
+            <span>Runbook</span>
+            <span>30-day enablement plan</span>
+            <span>Drift &amp; metric monitoring</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1069,6 +1437,7 @@
         <li><span class="dot"></span><div><strong>One senior lead, end to end.</strong> <span>No handoffs between strategy, design and engineering.</span></div></li>
         <li><span class="dot"></span><div><strong>Your code, your keys.</strong> <span>We deliver in your repos, your cloud, your vendor accounts. No lock-in.</span></div></li>
         <li><span class="dot"></span><div><strong>Evals as a first-class citizen.</strong> <span>Every AI feature ships with a measurable behaviour spec.</span></div></li>
+        <li><span class="dot"></span><div><strong>Adoption baked into delivery.</strong> <span>Hands-on enablement, runbooks and a 30-day handover so the system actually gets used after we leave.</span></div></li>
       </ul>
     </div>
   </div>
@@ -1127,9 +1496,96 @@
           <span class="milestone-dot"></span>
           <span class="milestone-week">Week 8</span>
         </div>
-        <p class="milestone-text">Production release + handover docs</p>
+        <p class="milestone-text">Production live + team trained to run it</p>
       </div>
     </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="eyebrow">Selected work</span>
+      <h2>One engagement, end to end.</h2>
+      <p>What an eight-week Axon engagement actually looks like — challenge, approach, outcome, in your team's words.</p>
+    </div>
+
+    <div class="case-card reveal">
+      <div class="case-meta">
+        <div class="case-logo">N</div>
+        <div class="case-titles">
+          <span class="case-client">NovaTech — Series C fintech</span>
+          <span class="case-tag">8-week engagement · Claude Code + OpenClaw</span>
+        </div>
+      </div>
+
+      <div class="case-grid">
+        <div class="case-block">
+          <div class="case-block-label">Challenge</div>
+          <p>Ops team was drowning in 12,000 monthly support tickets. Three failed AI pilots over 18 months. Leadership wanted production impact, not another demo.</p>
+        </div>
+        <div class="case-block">
+          <div class="case-block-label">Approach</div>
+          <p>Two-week discovery to map the workflow and pick the 5% of ticket types worth automating. Six weeks of weekly slices into their repo, with eval harness and human-review gates from day one.</p>
+        </div>
+        <div class="case-block">
+          <div class="case-block-label">Outcome</div>
+          <p>Triage agent live in production at week 6, full handover and runbook at week 8. Three trained internal owners. System still running at 94% accuracy six months later.</p>
+        </div>
+      </div>
+
+      <div class="case-outcomes">
+        <div class="outcome">
+          <div class="outcome-num">62%</div>
+          <div class="outcome-text">Tier-1 tickets resolved without human touch</div>
+        </div>
+        <div class="outcome">
+          <div class="outcome-num">8 wks</div>
+          <div class="outcome-text">From kickoff to production cutover</div>
+        </div>
+        <div class="outcome">
+          <div class="outcome-num">~40 hrs</div>
+          <div class="outcome-text">Analyst time reclaimed per week</div>
+        </div>
+      </div>
+
+      <p class="case-disclaimer">(Anonymised illustrative engagement — replace with a real client write-up before launch)</p>
+    </div>
+
+    <div class="testimonials">
+      <div class="testimonial reveal">
+        <p class="testimonial-quote">First AI engagement we've run that didn't end in a deck. Production, owned by our team, in eight weeks.</p>
+        <div class="testimonial-meta">
+          <div class="testimonial-avatar">JM</div>
+          <div>
+            <div class="testimonial-name">J. Martinez</div>
+            <div class="testimonial-role">VP Operations · NovaTech</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial reveal">
+        <p class="testimonial-quote">They cut three months of architecture debate in one workshop. The opportunity map paid for the engagement on its own.</p>
+        <div class="testimonial-meta">
+          <div class="testimonial-avatar">SK</div>
+          <div>
+            <div class="testimonial-name">S. Khan</div>
+            <div class="testimonial-role">Head of Product · Stackwell</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial reveal">
+        <p class="testimonial-quote">Senior, opinionated, in our repo. The handover wasn't a goodbye email — it was three trained owners and a runbook.</p>
+        <div class="testimonial-meta">
+          <div class="testimonial-avatar">EL</div>
+          <div>
+            <div class="testimonial-name">E. Larsen</div>
+            <div class="testimonial-role">CTO · Meridian</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="case-disclaimer reveal">(Illustrative testimonials — replace with real client quotes before launch)</p>
   </div>
 </section>
 
@@ -1193,6 +1649,7 @@
       <span class="eyebrow">Get started</span>
       <h2>Got an idea? Let's pressure-test it together.</h2>
       <p>A 30-minute consult is free. You'll leave with a rough scope, a delivery shape and an honest read on whether we're the right partner.</p>
+      <p class="cta-punch">Stop running pilots. <strong>Start shipping production.</strong></p>
       <div class="btn-row">
         <a href="https://calendly.com/achahbar-rami/15min" target="_blank" rel="noopener" class="btn btn-primary">Book a 30-min call <span class="arrow">→</span></a>
         <a href="#services" class="btn btn-ghost">Review services</a>
@@ -1205,9 +1662,10 @@
   <div class="container footer-inner">
     <p>© 2026 Axon. AI-native delivery, done properly.</p>
     <div class="footer-links">
-      <a href="#platforms">Platforms</a>
       <a href="#services">Services</a>
       <a href="#approach">Approach</a>
+      <a href="#work">Work</a>
+      <a href="#faq">FAQ</a>
       <a href="#contact">Contact</a>
     </div>
   </div>
