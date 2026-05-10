@@ -960,6 +960,7 @@
   @media (max-width: 880px) { .pillars { grid-template-columns: 1fr; } }
 
   .pillar {
+    position: relative;
     padding: 2.1rem 1.85rem;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -968,8 +969,24 @@
     flex-direction: column;
     box-shadow: var(--shadow-card);
     transition: border-color 0.25s, transform 0.3s cubic-bezier(.22,.68,0,1.2), background 0.3s, box-shadow 0.25s;
+    overflow: hidden;
   }
   .pillar:hover { border-color: var(--border-strong); transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
+  .pillar:hover .pillar-num { transform: translateY(-2px); }
+  .pillar:hover .pillar-illustration { color: var(--accent); opacity: 1; transform: rotate(-4deg) scale(1.04); }
+
+  .pillar-illustration {
+    position: absolute;
+    top: 1.6rem;
+    right: 1.6rem;
+    width: 56px;
+    height: 56px;
+    color: var(--text-mute);
+    opacity: 0.55;
+    transition: color 0.35s ease, opacity 0.35s ease, transform 0.45s cubic-bezier(.22,.68,0,1.2);
+    pointer-events: none;
+  }
+  .pillar-num { transition: transform 0.35s cubic-bezier(.22,.68,0,1.2); }
 
   .pillar-num {
     font-family: 'Instrument Serif', Georgia, serif;
@@ -1014,28 +1031,20 @@
     display: grid;
     grid-template-columns: 1.6rem 1fr;
     gap: 0.5rem;
-    align-items: baseline;
+    align-items: center;
     transition: border-color 0.3s;
   }
   .pillar-stages .step-num {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     color: var(--accent);
     transition: color 0.3s;
   }
   .pillar-stages .step-name {
     color: var(--text);
     font-weight: 600;
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     letter-spacing: -0.005em;
-  }
-  .pillar-stages .step-desc {
-    display: block;
-    color: var(--text-dim);
-    font-size: 0.83rem;
-    line-height: 1.5;
-    margin-top: 0.2rem;
-    transition: color 0.3s;
   }
 
   .pillar-deliverables { margin-top: 1.4rem; padding-top: 1.2rem; border-top: 1px dashed var(--border-strong); transition: border-color 0.3s; }
@@ -1329,24 +1338,17 @@
     </div>
     <div class="pillars">
       <div class="pillar reveal">
+        <svg class="pillar-illustration" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+          <circle cx="22" cy="26" r="13"/>
+          <circle cx="42" cy="26" r="13"/>
+          <circle cx="32" cy="42" r="13"/>
+        </svg>
         <div class="pillar-num">01</div>
         <div class="pillar-name"><span class="gradient">Discover</span></div>
         <p class="pillar-tagline">Understand how your team actually works. Find the small set of opportunities worth building.</p>
         <ul class="pillar-stages">
-          <li>
-            <span class="step-num">a.</span>
-            <div>
-              <span class="step-name">Consultation</span>
-              <span class="step-desc">Pressure-test the idea, map stakeholders, name the business outcome.</span>
-            </div>
-          </li>
-          <li>
-            <span class="step-num">b.</span>
-            <div>
-              <span class="step-name">Fit-Gap Analysis</span>
-              <span class="step-desc">Benchmark your process against Lovable, Claude Code and OpenClaw out of the box; call out where custom work is needed.</span>
-            </div>
-          </li>
+          <li><span class="step-num">a.</span><span class="step-name">Consultation</span></li>
+          <li><span class="step-num">b.</span><span class="step-name">Fit-Gap Analysis</span></li>
         </ul>
         <div class="pillar-deliverables">
           <div class="pillar-deliverables-label">You leave with</div>
@@ -1359,31 +1361,21 @@
       </div>
 
       <div class="pillar reveal">
+        <svg class="pillar-illustration" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true">
+          <rect x="14" y="14" width="36" height="10" rx="2"/>
+          <rect x="14" y="27" width="36" height="10" rx="2"/>
+          <rect x="14" y="40" width="36" height="10" rx="2"/>
+          <line x1="20" y1="19" x2="28" y2="19"/>
+          <line x1="20" y1="32" x2="32" y2="32"/>
+          <line x1="20" y1="45" x2="24" y2="45"/>
+        </svg>
         <div class="pillar-num">02</div>
         <div class="pillar-name"><span class="gradient">Build</span></div>
         <p class="pillar-tagline">Ship weekly vertical slices into your repo, with tests and evals as first-class citizens.</p>
         <ul class="pillar-stages">
-          <li>
-            <span class="step-num">a.</span>
-            <div>
-              <span class="step-name">Design</span>
-              <span class="step-desc">Product, data and agent architecture in one deliverable — flows, prompts, schemas, evals, SLAs.</span>
-            </div>
-          </li>
-          <li>
-            <span class="step-num">b.</span>
-            <div>
-              <span class="step-name">Build</span>
-              <span class="step-desc">Senior engineers pairing with Claude Code, Lovable and OpenClaw — weekly slices, review gates, telemetry baked in.</span>
-            </div>
-          </li>
-          <li>
-            <span class="step-num">c.</span>
-            <div>
-              <span class="step-name">Test</span>
-              <span class="step-desc">LLM eval suites, integration tests, structured UAT. No release without a green board.</span>
-            </div>
-          </li>
+          <li><span class="step-num">a.</span><span class="step-name">Design</span></li>
+          <li><span class="step-num">b.</span><span class="step-name">Build</span></li>
+          <li><span class="step-num">c.</span><span class="step-name">Test</span></li>
         </ul>
         <div class="pillar-deliverables">
           <div class="pillar-deliverables-label">You leave with</div>
@@ -1396,24 +1388,18 @@
       </div>
 
       <div class="pillar reveal">
+        <svg class="pillar-illustration" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 50 Q 22 28, 32 36 T 52 16"/>
+          <path d="M52 16 L52 30"/>
+          <path d="M52 16 L60 19 L52 22 Z"/>
+          <circle cx="52" cy="30" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
         <div class="pillar-num">03</div>
         <div class="pillar-name"><span class="gradient">Land</span></div>
         <p class="pillar-tagline">Get it into production and into your team's hands. Make sure it's still being used in 90 days.</p>
         <ul class="pillar-stages">
-          <li>
-            <span class="step-num">a.</span>
-            <div>
-              <span class="step-name">Go-Live</span>
-              <span class="step-desc">Cutover planning, phased rollout, data migration, comms, training and a war-room through the first business days.</span>
-            </div>
-          </li>
-          <li>
-            <span class="step-num">b.</span>
-            <div>
-              <span class="step-name">Post Go-Live Support</span>
-              <span class="step-desc">Hypercare, model-drift monitoring, continuous improvement, and a roadmap that keeps compounding value quarter after quarter.</span>
-            </div>
-          </li>
+          <li><span class="step-num">a.</span><span class="step-name">Go-Live</span></li>
+          <li><span class="step-num">b.</span><span class="step-name">Post Go-Live Support</span></li>
         </ul>
         <div class="pillar-deliverables">
           <div class="pillar-deliverables-label">You leave with</div>
