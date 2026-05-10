@@ -342,6 +342,8 @@
   }
 
   h1 .gradient {
+    display: inline-block;
+    padding-right: 0.18em;
     background: var(--gradient);
     background-clip: text;
     -webkit-background-clip: text;
@@ -712,17 +714,27 @@
   }
   .milestone-marker {
     display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    margin-bottom: 1.1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+    margin-bottom: 0.9rem;
+    position: relative;
+    z-index: 1;
   }
   .milestone-dot {
     width: 14px;
     height: 14px;
     border-radius: 50%;
     background: var(--gradient);
-    box-shadow: 0 0 14px var(--glow-1);
+    box-shadow: 0 0 14px var(--glow-1), 0 0 0 4px var(--surface);
     flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+  }
+  .milestone--finish .milestone-dot {
+    width: 18px;
+    height: 18px;
+    box-shadow: 0 0 14px var(--glow-1), 0 0 0 4px var(--surface), 0 0 0 5px var(--accent);
   }
   .milestone-week {
     font-family: 'JetBrains Mono', monospace;
@@ -743,13 +755,16 @@
   .milestone-connector {
     position: absolute;
     top: calc(2.4rem + 7px);
-    left: calc(1.9rem + 14px + 0.5rem);
-    right: -1px;
+    left: 0;
+    right: 0;
     height: 1px;
     background: linear-gradient(90deg, var(--accent), var(--accent-2));
-    opacity: 0.35;
+    opacity: 0.4;
+    z-index: 0;
   }
-  .milestone:last-child .milestone-connector { display: none; }
+  .milestone--finish .milestone-connector {
+    background: linear-gradient(90deg, var(--accent-2), transparent 75%);
+  }
   @media (max-width: 760px) { .milestone-connector { display: none; } }
 
   /* Team */
@@ -976,6 +991,8 @@
     line-height: 1.1;
   }
   .pillar-name .gradient {
+    display: inline-block;
+    padding-right: 0.18em;
     background: var(--gradient);
     background-clip: text;
     -webkit-background-clip: text;
@@ -1247,8 +1264,8 @@
 
 <div class="pre-hero">
   <div class="container">
-    <p class="reveal">You bought the AI tools. Sat through the demos. Ran the pilots.</p>
-    <p class="reveal">Six months later, the rollout stalled and nobody can explain the ROI.</p>
+    <p class="reveal">You don't need another AI demo.</p>
+    <p class="reveal">You need a delivery partner who'll sit with your team until it's shipped, owned, and still running in 90 days.</p>
   </div>
 </div>
 
@@ -1491,12 +1508,13 @@
         <p class="milestone-text">Pilot live with internal users</p>
         <span class="milestone-connector"></span>
       </div>
-      <div class="milestone">
+      <div class="milestone milestone--finish">
         <div class="milestone-marker">
           <span class="milestone-dot"></span>
           <span class="milestone-week">Week 8</span>
         </div>
         <p class="milestone-text">Production live + team trained to run it</p>
+        <span class="milestone-connector"></span>
       </div>
     </div>
   </div>
