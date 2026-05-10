@@ -1343,6 +1343,7 @@
 <div class="grid-bg"></div>
 
 <nav id="site-nav">
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
   <div class="container nav-inner">
     <a href="#" class="logo">
       <span class="logo-mark">A</span>
@@ -1824,8 +1825,14 @@
   });
 
   const nav = document.getElementById('site-nav');
+  const progressBar = document.getElementById('scroll-progress');
   window.addEventListener('scroll', () => {
     nav.classList.toggle('scrolled', window.scrollY > 40);
+    if (progressBar) {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const ratio = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
+      progressBar.style.width = (ratio * 100) + '%';
+    }
   }, { passive: true });
 
   const headline = document.getElementById('hero-headline');
