@@ -1485,6 +1485,126 @@
   .testimonial { transition: background 0.3s, border-color 0.3s, transform 0.3s cubic-bezier(.22,.68,0,1.2), box-shadow 0.25s; }
   .testimonial:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
 
+  /* ── Hero scope generator ─────────────────────────────── */
+  .scope-gen {
+    max-width: 620px;
+    margin: 2.4rem auto 0;
+    text-align: left;
+  }
+  .scope-form {
+    display: flex;
+    gap: 0.6rem;
+    padding: 0.5rem;
+    background: color-mix(in srgb, var(--surface) 60%, transparent);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    box-shadow: var(--shadow-card);
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .scope-form:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  .scope-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    resize: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    padding: 0.55rem 0.6rem;
+    min-height: 2.6rem;
+    max-height: 6rem;
+  }
+  .scope-input:focus { outline: none; }
+  .scope-input::placeholder { color: var(--text-mute); }
+  .scope-submit {
+    flex-shrink: 0;
+    align-self: stretch;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0 1.1rem;
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s, background 0.3s, color 0.3s;
+    white-space: nowrap;
+  }
+  .scope-submit:hover:not(:disabled) { transform: translateY(-1px); }
+  .scope-submit:disabled { opacity: 0.55; cursor: default; }
+  .scope-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-mute);
+    margin: 0.7rem 0 0 0.3rem;
+    transition: color 0.3s;
+  }
+  .scope-hint b { color: var(--accent); font-weight: 500; cursor: pointer; transition: color 0.2s; }
+  .scope-hint b:hover { color: var(--text); }
+  .scope-output {
+    margin-top: 1rem;
+    padding: 1.3rem 1.4rem;
+    background: color-mix(in srgb, var(--surface) 66%, transparent);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-card);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    display: none;
+    animation: demo-fade 0.4s ease;
+  }
+  .scope-output.show { display: block; }
+  .scope-output-head {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-mute);
+    margin-bottom: 0.9rem;
+  }
+  .scope-output-head .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent-2); box-shadow: 0 0 6px var(--accent-2);
+    animation: pulse-dot 1.6s ease-in-out infinite;
+  }
+  .scope-body strong { color: var(--text); font-weight: 600; }
+  .scope-body { white-space: pre-wrap; }
+  .scope-stream-cursor {
+    display: inline-block;
+    width: 7px; height: 1.05em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    margin-left: 1px;
+    animation: cursor-blink 1s steps(2, jump-none) infinite;
+  }
+  .scope-cta {
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    display: none;
+  }
+  .scope-cta.show { display: block; }
+  .scope-cta a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .scope-cta a:hover { text-decoration: underline; }
+
   /* ── Live pillar demos ─────────────────────────────── */
   .pillar-demo-details {
     margin-top: 1.2rem;
@@ -1898,6 +2018,24 @@
     <div class="btn-row reveal">
       <a href="https://calendly.com/achahbar-rami/15min" target="_blank" rel="noopener" class="btn btn-primary">Book a 30-min call <span class="arrow">→</span></a>
       <a href="#services" class="btn btn-ghost">See how we deliver</a>
+    </div>
+
+    <div class="scope-gen reveal">
+      <form class="scope-form" id="scope-form">
+        <label for="scope-input" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Describe your workflow</label>
+        <textarea class="scope-input" id="scope-input" rows="1" maxlength="400"
+          placeholder="Describe a workflow in one line — I'll draft a 3-week scope live…"></textarea>
+        <button type="submit" class="scope-submit" id="scope-submit">Generate scope <span class="arrow">→</span></button>
+      </form>
+      <p class="scope-hint" id="scope-hint">Powered by Claude · try
+        <b data-sample="support ticket triage">support ticket triage</b> ·
+        <b data-sample="monthly board report">monthly board report</b> ·
+        <b data-sample="onboarding new customers">onboarding customers</b></p>
+      <div class="scope-output" id="scope-output" aria-live="polite">
+        <div class="scope-output-head"><span class="live-dot"></span>Axon scope · draft</div>
+        <div class="scope-body" id="scope-body"></div>
+        <div class="scope-cta" id="scope-cta">Like the shape of this? <a href="https://calendly.com/achahbar-rami/15min" target="_blank" rel="noopener">Book a 30-min call →</a> and we'll pressure-test it together.</div>
+      </div>
     </div>
   </div>
 </header>
@@ -2820,6 +2958,128 @@
     }
 
     select.addEventListener('change', () => apply(select.value));
+  })();
+
+  /* Shared: minimal, safe markdown → HTML (bold + bullet lists only) */
+  function miniMarkdown(src) {
+    const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const lines = src.split('\n');
+    let html = '';
+    let inList = false;
+    for (let raw of lines) {
+      const line = raw.replace(/\s+$/, '');
+      if (/^\s*[-*]\s+/.test(line)) {
+        if (!inList) { html += '<ul style="margin:0.3rem 0 0.8rem 1.1rem;">'; inList = true; }
+        let item = esc(line.replace(/^\s*[-*]\s+/, ''));
+        item = item.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        html += `<li style="margin:0.15rem 0;">${item}</li>`;
+      } else {
+        if (inList) { html += '</ul>'; inList = false; }
+        if (line.trim() === '') { html += '<div style="height:0.5rem;"></div>'; continue; }
+        let p = esc(line).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        html += `<div>${p}</div>`;
+      }
+    }
+    if (inList) html += '</ul>';
+    return html;
+  }
+
+  /* Shared: stream from the Claude proxy, calling onToken for each chunk */
+  async function streamClaude(mode, payload, onToken, onDone, onError) {
+    const base = window.AXON_API_BASE || '';
+    let res;
+    try {
+      res = await fetch(`${base}/api/claude?mode=${mode}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      onError('Our assistant is warming up — try again or book a call directly.');
+      return;
+    }
+    if (!res.ok || !res.body) {
+      onError('Our assistant is warming up — try again or book a call directly.');
+      return;
+    }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let errored = false;
+    while (true) {
+      let chunk;
+      try { chunk = await reader.read(); } catch { onError('Stream interrupted — please retry.'); return; }
+      if (chunk.done) break;
+      buffer += decoder.decode(chunk.value, { stream: true });
+      const events = buffer.split('\n\n');
+      buffer = events.pop() || '';
+      for (const evt of events) {
+        const isError = evt.includes('event: error');
+        const dataLine = evt.split('\n').find((l) => l.startsWith('data:'));
+        if (!dataLine) continue;
+        try {
+          const parsed = JSON.parse(dataLine.slice(5).trim());
+          if (isError) { errored = true; onError(parsed.message || 'Something went wrong.'); return; }
+          if (parsed.text) onToken(parsed.text);
+          if (parsed.done) { onDone(); return; }
+        } catch { /* skip */ }
+      }
+    }
+    if (!errored) onDone();
+  }
+
+  /* Hero scope generator */
+  (function initScopeGen() {
+    const form = document.getElementById('scope-form');
+    const input = document.getElementById('scope-input');
+    const submit = document.getElementById('scope-submit');
+    const output = document.getElementById('scope-output');
+    const bodyEl = document.getElementById('scope-body');
+    const ctaEl = document.getElementById('scope-cta');
+    const hint = document.getElementById('scope-hint');
+    if (!form) return;
+
+    // auto-grow textarea
+    input.addEventListener('input', () => {
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 96) + 'px';
+    });
+
+    // sample chips
+    hint.querySelectorAll('b[data-sample]').forEach((b) => {
+      b.addEventListener('click', () => { input.value = b.dataset.sample; input.focus(); });
+    });
+
+    let busy = false;
+    let lastCall = 0;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const workflow = input.value.trim();
+      if (!workflow || busy) return;
+      const now = Date.now();
+      if (now - lastCall < 800) return;
+      lastCall = now;
+
+      busy = true;
+      submit.disabled = true;
+      submit.textContent = 'Drafting…';
+      output.classList.add('show');
+      ctaEl.classList.remove('show');
+      bodyEl.innerHTML = '<span class="scope-stream-cursor"></span>';
+
+      let acc = '';
+      await streamClaude('scope', { workflow },
+        (t) => { acc += t; bodyEl.innerHTML = miniMarkdown(acc) + '<span class="scope-stream-cursor"></span>'; output.scrollIntoView({ block: 'nearest' }); },
+        () => { bodyEl.innerHTML = miniMarkdown(acc); ctaEl.classList.add('show'); reset(); },
+        (msg) => { bodyEl.innerHTML = `<div style="color:var(--text-dim)">${msg}</div>`; ctaEl.classList.add('show'); reset(); }
+      );
+
+      function reset() {
+        busy = false;
+        submit.disabled = false;
+        submit.innerHTML = 'Generate scope <span class="arrow">→</span>';
+      }
+    });
   })();
 </script>
 
