@@ -1485,6 +1485,89 @@
   .testimonial { transition: background 0.3s, border-color 0.3s, transform 0.3s cubic-bezier(.22,.68,0,1.2), box-shadow 0.25s; }
   .testimonial:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
 
+  /* Text scramble */
+  .scramble .dud { color: var(--accent); opacity: 0.65; }
+  .scramble.gradient .dud { -webkit-text-fill-color: initial; color: var(--accent); background: none; -webkit-background-clip: initial; background-clip: initial; opacity: 0.75; }
+
+  /* Rotating tagline typewriter */
+  .tagline-cycler {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.3rem;
+    margin-top: 1.5rem;
+    padding: 0.35rem 0.9rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    background: color-mix(in srgb, var(--surface) 55%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-dim);
+    max-width: 100%;
+    letter-spacing: -0.005em;
+    transition: background 0.3s, border-color 0.3s, color 0.3s;
+  }
+  .tagline-prompt { color: var(--accent); font-weight: 500; transition: color 0.3s; }
+  .tagline-text { color: var(--text); min-height: 1em; transition: color 0.3s; }
+  .tagline-cursor { color: var(--accent); font-weight: 300; animation: cursor-blink 1s steps(2, jump-none) infinite; transition: color 0.3s; }
+  @keyframes cursor-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .tagline-cursor { animation: none; }
+  }
+
+  /* Pillar illustration draw-on animation */
+  .pillar-illustration circle,
+  .pillar-illustration rect,
+  .pillar-illustration path,
+  .pillar-illustration line {
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    transition: stroke-dashoffset 1.4s cubic-bezier(.22, .68, 0, 1);
+  }
+  .pillar-illustration circle:nth-child(1) { transition-delay: 0ms; }
+  .pillar-illustration circle:nth-child(2), .pillar-illustration rect:nth-child(2), .pillar-illustration path:nth-child(2) { transition-delay: 180ms; }
+  .pillar-illustration circle:nth-child(3), .pillar-illustration rect:nth-child(3), .pillar-illustration path:nth-child(3) { transition-delay: 360ms; }
+  .pillar-illustration :nth-child(4) { transition-delay: 540ms; }
+  .pillar-illustration :nth-child(5) { transition-delay: 720ms; }
+  .pillar-illustration :nth-child(6) { transition-delay: 900ms; }
+  .pillar.in .pillar-illustration circle,
+  .pillar.in .pillar-illustration rect,
+  .pillar.in .pillar-illustration path,
+  .pillar.in .pillar-illustration line {
+    stroke-dashoffset: 0;
+  }
+  .pillar-illustration circle[fill="currentColor"] { fill: currentColor; stroke: none; }
+  /* Idle motion */
+  @keyframes pillar-glow-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 0.9; } }
+  .pillar.in .pillar-illustration { animation: pillar-glow-pulse 4.5s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .pillar-illustration circle,
+    .pillar-illustration rect,
+    .pillar-illustration path,
+    .pillar-illustration line {
+      stroke-dashoffset: 0;
+      transition: none;
+    }
+    .pillar.in .pillar-illustration { animation: none; }
+  }
+
+  /* Live code stream */
+  .code-stream { position: relative; }
+  .code-stream .code-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    margin-left: 2px;
+    animation: cursor-blink 1s steps(2, jump-none) infinite;
+    transition: background 0.3s;
+  }
+  .code-stream .code-hidden { opacity: 0; }
+  .code-stream .code-line { display: block; min-height: 1.85em; }
+
   /* Scroll animations */
   .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
   .reveal.in { opacity: 1; transform: translateY(0); }
@@ -1560,6 +1643,11 @@
   <div class="container">
     <p class="reveal">You don't need another AI demo.</p>
     <p class="reveal">You need a delivery partner who'll sit with your team until it's shipped, owned, and still running in 90 days.</p>
+    <div class="tagline-cycler reveal" aria-hidden="true">
+      <span class="tagline-prompt">axon —</span>
+      <span class="tagline-text" id="tagline-text"></span>
+      <span class="tagline-cursor">▍</span>
+    </div>
   </div>
 </div>
 
@@ -1569,7 +1657,7 @@
       <span class="pill-dot"></span>
       Workflow-first AI delivery on Lovable · Claude Code · OpenClaw
     </div>
-    <h1 class="reveal" id="hero-headline">Ship AI-native products <span class="gradient">in weeks,</span> not quarters.</h1>
+    <h1 class="reveal" id="hero-headline" aria-label="Ship AI-native products in weeks, not quarters."><span class="scramble" data-final="Ship AI-native products ">Ship AI-native products </span><span class="scramble gradient" data-final="in weeks,">in weeks,</span><span class="scramble" data-final=" not quarters."> not quarters.</span></h1>
     <p class="lead reveal">We scope what's worth building, build it in your repo, and train your team to run it. End-to-end delivery on Lovable, Claude Code and OpenClaw — the rigour of enterprise consulting at the cadence of a studio.</p>
     <div class="btn-row reveal">
       <a href="https://calendly.com/achahbar-rami/15min" target="_blank" rel="noopener" class="btn btn-primary">Book a 30-min call <span class="arrow">→</span></a>
@@ -1703,7 +1791,7 @@
   <div class="container two-col">
     <div class="approach-visual from-left">
       <div class="terminal-bar"><span></span><span></span><span></span></div>
-      <pre class="code"><span class="c"># axon / sprint-1 / deliverables.md</span>
+      <pre class="code code-stream" id="code-stream"><span class="c"># axon / sprint-1 / deliverables.md</span>
 
 <span class="s">[x]</span> discovery workshop, stakeholders aligned
 <span class="s">[x]</span> success metrics + scope signed off
@@ -2111,6 +2199,153 @@
   }, { threshold: [0.3, 0.6], rootMargin: '-20% 0px -40% 0px' });
   hueSections.forEach(s => hueObserver.observe(s));
   setHue('purple');
+
+  /* Text scramble on hero H1 */
+  (function initScramble() {
+    if (reduceMotion) return;
+    const targets = document.querySelectorAll('#hero-headline .scramble');
+    const chars = '!<>-_\\/[]{}—=+*^?#░▒▓█▌▐▮▯▰▱abcdef0123456789';
+    function randChar() { return chars[Math.floor(Math.random() * chars.length)]; }
+    targets.forEach((el, idx) => {
+      const final = el.dataset.final || el.textContent;
+      const queue = [];
+      for (let i = 0; i < final.length; i++) {
+        const start = Math.floor(Math.random() * 12) + idx * 4;
+        const end = start + Math.floor(Math.random() * 18) + 8;
+        queue.push({ to: final[i], start, end, ch: '' });
+      }
+      let frame = 0;
+      function render() {
+        let out = '';
+        let done = 0;
+        for (let i = 0; i < queue.length; i++) {
+          const q = queue[i];
+          if (frame >= q.end) { out += q.to; done++; }
+          else if (frame >= q.start) {
+            if (!q.ch || Math.random() < 0.32) q.ch = q.to === ' ' ? ' ' : randChar();
+            out += '<span class="dud">' + q.ch + '</span>';
+          } else { out += q.to === ' ' ? ' ' : '&nbsp;'; }
+        }
+        el.innerHTML = out;
+        if (done < queue.length) { frame++; requestAnimationFrame(render); }
+        else { el.textContent = final; }
+      }
+      // Start with all placeholders hidden
+      el.innerHTML = final.split('').map(c => c === ' ' ? ' ' : '&nbsp;').join('');
+      setTimeout(() => requestAnimationFrame(render), 220 + idx * 140);
+    });
+  })();
+
+  /* Rotating tagline typewriter */
+  (function initTagline() {
+    const target = document.getElementById('tagline-text');
+    if (!target) return;
+    const phrases = [
+      "scopes what's actually worth building.",
+      "builds it in your repo, not ours.",
+      "trains your team to run it after we leave.",
+      "measures every AI feature with real evals.",
+      "doesn't leave until it's compounding value."
+    ];
+    if (reduceMotion) { target.textContent = phrases[0]; return; }
+    let phraseIdx = 0;
+    let charIdx = 0;
+    let deleting = false;
+    function tick() {
+      const phrase = phrases[phraseIdx];
+      if (!deleting) {
+        charIdx++;
+        target.textContent = phrase.slice(0, charIdx);
+        if (charIdx >= phrase.length) {
+          deleting = true;
+          setTimeout(tick, 2200);
+          return;
+        }
+      } else {
+        charIdx--;
+        target.textContent = phrase.slice(0, charIdx);
+        if (charIdx <= 0) {
+          deleting = false;
+          phraseIdx = (phraseIdx + 1) % phrases.length;
+          setTimeout(tick, 350);
+          return;
+        }
+      }
+      setTimeout(tick, deleting ? 22 : 42);
+    }
+    setTimeout(tick, 1400);
+  })();
+
+  /* Live sprint code stream */
+  (function initCodeStream() {
+    const el = document.getElementById('code-stream');
+    if (!el || reduceMotion) return;
+    // Clear the initial static content now; play() will refill on scroll-in
+    const template = el.innerHTML;
+    el.innerHTML = '';
+    // Structured lines to type
+    const lines = [
+      { html: '<span class="c"># axon / sprint-1 / deliverables.md</span>', delay: 30 },
+      { html: '', delay: 0 },
+      { html: '<span class="s">[x]</span> discovery workshop, stakeholders aligned', delay: 22 },
+      { html: '<span class="s">[x]</span> success metrics + scope signed off', delay: 22 },
+      { html: '<span class="s">[x]</span> architecture diagram committed to repo', delay: 22 },
+      { html: '<span class="s">[x]</span> auth + data layer scaffolded in your cloud', delay: 22 },
+      { html: '<span class="s">[x]</span> first vertical slice deployed to staging', delay: 22 },
+      { html: '<span class="c">[ ]</span> eval suite — <span class="n">12</span> happy-path cases green', delay: 26 },
+      { html: '<span class="c">[ ]</span> UAT script delivered to client lead', delay: 26 },
+      { html: '<span class="c">[ ]</span> week-1 demo — <span class="n">friday 16:00</span>', delay: 26 }
+    ];
+    function strip(html) {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      return div.textContent;
+    }
+    let running = false;
+    function play() {
+      if (running) return;
+      running = true;
+      el.innerHTML = '';
+      let lineIdx = 0;
+      function nextLine() {
+        if (lineIdx >= lines.length) {
+          setTimeout(() => { running = false; play(); }, 6500);
+          return;
+        }
+        const line = lines[lineIdx];
+        const lineEl = document.createElement('span');
+        lineEl.className = 'code-line';
+        el.appendChild(lineEl);
+        el.appendChild(document.createTextNode('\n'));
+        // Empty line
+        if (!line.html) { lineIdx++; setTimeout(nextLine, 120); return; }
+        // Type character by character; but keep HTML formatting
+        const text = strip(line.html);
+        let charIdx = 0;
+        const cursor = document.createElement('span');
+        cursor.className = 'code-cursor';
+        lineEl.appendChild(cursor);
+        function typeChar() {
+          if (charIdx >= text.length) {
+            // Swap in full HTML with markup
+            lineEl.innerHTML = line.html;
+            lineIdx++;
+            setTimeout(nextLine, 260);
+            return;
+          }
+          cursor.insertAdjacentText('beforebegin', text[charIdx]);
+          charIdx++;
+          setTimeout(typeChar, line.delay + Math.random() * 12);
+        }
+        typeChar();
+      }
+      nextLine();
+    }
+    const streamObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) play(); });
+    }, { threshold: 0.35 });
+    streamObs.observe(el);
+  })();
 </script>
 
 </body>
