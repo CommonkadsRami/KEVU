@@ -138,24 +138,189 @@
     position: fixed;
     inset: 0;
     z-index: -1;
-    background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, var(--glow-1), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 90% 110%, var(--glow-2), transparent 60%),
-      radial-gradient(ellipse 40% 30% at 10% 80%, var(--glow-3), transparent 60%),
-      var(--bg);
-    transition: background 0.3s ease;
+    background: var(--bg);
+    overflow: hidden;
+    transition: background 0.5s ease;
+    isolation: isolate;
   }
 
-  .grid-bg::before {
-    content: '';
+  /* Aurora mesh — drifting colour blobs */
+  .aurora {
+    position: absolute;
+    inset: -20%;
+    z-index: 0;
+    filter: blur(80px) saturate(1.15);
+    opacity: 0.7;
+    transition: opacity 0.4s ease, filter 0.4s ease;
+  }
+  [data-theme="light"] .aurora,
+  :root:not([data-theme="dark"]) .aurora { opacity: 0.55; filter: blur(90px) saturate(1.05); }
+
+  .aurora-blob {
+    position: absolute;
+    width: 55vw;
+    height: 55vw;
+    max-width: 900px;
+    max-height: 900px;
+    border-radius: 50%;
+    mix-blend-mode: screen;
+    will-change: transform;
+  }
+  [data-theme="light"] .aurora-blob,
+  :root:not([data-theme="dark"]) .aurora-blob { mix-blend-mode: multiply; opacity: 0.55; }
+
+  .aurora-blob--1 { background: radial-gradient(circle, var(--accent) 0%, transparent 65%); top: -10vw; left: -12vw; animation: aurora-drift-1 46s ease-in-out infinite; }
+  .aurora-blob--2 { background: radial-gradient(circle, var(--accent-2) 0%, transparent 65%); top: 5vw;  right: -18vw; animation: aurora-drift-2 58s ease-in-out infinite; }
+  .aurora-blob--3 { background: radial-gradient(circle, var(--accent-3) 0%, transparent 65%); bottom: -20vw; left: 18vw; animation: aurora-drift-3 52s ease-in-out infinite; }
+  .aurora-blob--4 { background: radial-gradient(circle, var(--accent) 0%, transparent 65%); bottom: -8vw; right: -8vw; animation: aurora-drift-4 64s ease-in-out infinite; opacity: 0.8; }
+
+  @keyframes aurora-drift-1 {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    33% { transform: translate3d(14vw, 9vw, 0) scale(1.1); }
+    66% { transform: translate3d(-8vw, 18vw, 0) scale(0.95); }
+  }
+  @keyframes aurora-drift-2 {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    40% { transform: translate3d(-18vw, 14vw, 0) scale(1.12); }
+    75% { transform: translate3d(-10vw, -4vw, 0) scale(0.92); }
+  }
+  @keyframes aurora-drift-3 {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(22vw, -14vw, 0) scale(1.18); }
+  }
+  @keyframes aurora-drift-4 {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+    35% { transform: translate3d(-14vw, -8vw, 0) scale(1); }
+    70% { transform: translate3d(9vw, 5vw, 0) scale(1.12); }
+  }
+
+  /* Cursor spotlight */
+  .cursor-spot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--glow-1) 0%, transparent 65%);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(-50%, -50%, 0);
+    transition: opacity 0.4s ease;
+    z-index: 1;
+    mix-blend-mode: screen;
+    will-change: transform;
+  }
+  [data-theme="light"] .cursor-spot,
+  :root:not([data-theme="dark"]) .cursor-spot { mix-blend-mode: multiply; }
+  .cursor-spot.active { opacity: 0.7; }
+  @media (hover: none), (pointer: coarse) {
+    .cursor-spot { display: none; }
+  }
+
+  /* Grid overlay */
+  .grid-overlay {
     position: absolute;
     inset: 0;
+    z-index: 2;
+    pointer-events: none;
     background-image:
       linear-gradient(var(--grid-line) 1px, transparent 1px),
       linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size: 56px 56px;
     mask-image: radial-gradient(ellipse 100% 70% at 50% 30%, black 40%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 30%, black 40%, transparent 80%);
   }
+
+  /* Grain texture */
+  .grain {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0.06;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    mix-blend-mode: overlay;
+  }
+  [data-theme="light"] .grain,
+  :root:not([data-theme="dark"]) .grain { opacity: 0.045; mix-blend-mode: multiply; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aurora-blob { animation: none; }
+    .cursor-spot { display: none; }
+  }
+
+  /* Glassmorphism refresh — cards become frosted glass floating over the aurora */
+  @supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+    .pillar,
+    .testimonial,
+    .case-card,
+    .team-card,
+    .milestones,
+    .approach-visual,
+    .cta,
+    .pill,
+    .trust-chip,
+    .outcome,
+    .btn-ghost,
+    .theme-toggle,
+    .pillar-deliverables-list span {
+      background: color-mix(in srgb, var(--surface) 68%, transparent);
+      backdrop-filter: blur(14px) saturate(1.4);
+      -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    }
+    .stat, .platform {
+      background: color-mix(in srgb, var(--surface) 68%, transparent);
+      backdrop-filter: blur(14px) saturate(1.4);
+      -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    }
+    [data-theme="light"] .pillar,
+    [data-theme="light"] .testimonial,
+    [data-theme="light"] .case-card,
+    [data-theme="light"] .team-card,
+    [data-theme="light"] .milestones,
+    [data-theme="light"] .approach-visual,
+    [data-theme="light"] .cta,
+    [data-theme="light"] .pill,
+    [data-theme="light"] .trust-chip,
+    [data-theme="light"] .outcome,
+    [data-theme="light"] .btn-ghost,
+    [data-theme="light"] .theme-toggle,
+    [data-theme="light"] .pillar-deliverables-list span,
+    [data-theme="light"] .stat,
+    [data-theme="light"] .platform,
+    :root:not([data-theme="dark"]) .pillar,
+    :root:not([data-theme="dark"]) .testimonial,
+    :root:not([data-theme="dark"]) .case-card,
+    :root:not([data-theme="dark"]) .team-card,
+    :root:not([data-theme="dark"]) .milestones,
+    :root:not([data-theme="dark"]) .approach-visual,
+    :root:not([data-theme="dark"]) .cta,
+    :root:not([data-theme="dark"]) .pill,
+    :root:not([data-theme="dark"]) .trust-chip,
+    :root:not([data-theme="dark"]) .outcome,
+    :root:not([data-theme="dark"]) .btn-ghost,
+    :root:not([data-theme="dark"]) .theme-toggle,
+    :root:not([data-theme="dark"]) .pillar-deliverables-list span,
+    :root:not([data-theme="dark"]) .stat,
+    :root:not([data-theme="dark"]) .platform {
+      background: color-mix(in srgb, var(--surface) 80%, transparent);
+    }
+    nav {
+      background: color-mix(in srgb, var(--bg) 60%, transparent);
+      backdrop-filter: blur(20px) saturate(1.3);
+      -webkit-backdrop-filter: blur(20px) saturate(1.3);
+    }
+  }
+
+  /* Section hue scoping — different accent tint per section, gradient stays constant */
+  :root { transition: none; }
+  html.hue-purple { --accent: #a78bfa; --accent-2: #c4b0ff; --glow-1: rgba(167,139,250,0.22); }
+  html.hue-teal   { --accent: #5eead4; --accent-2: #7dd3fc; --glow-1: rgba(94,234,212,0.22); }
+  html.hue-amber  { --accent: #fbbf24; --accent-2: #fb923c; --glow-1: rgba(251,191,36,0.18); }
+  html[data-theme="light"].hue-purple, html:not([data-theme="dark"]).hue-purple { --accent: #6d28d9; --accent-2: #7c3aed; --glow-1: rgba(109,40,217,0.10); }
+  html[data-theme="light"].hue-teal,   html:not([data-theme="dark"]).hue-teal   { --accent: #0f766e; --accent-2: #0891b2; --glow-1: rgba(15,118,110,0.09); }
+  html[data-theme="light"].hue-amber,  html:not([data-theme="dark"]).hue-amber  { --accent: #b45309; --accent-2: #c2410c; --glow-1: rgba(180,83,9,0.08); }
 
   .container {
     max-width: 1200px;
@@ -1320,6 +1485,639 @@
   .testimonial { transition: background 0.3s, border-color 0.3s, transform 0.3s cubic-bezier(.22,.68,0,1.2), box-shadow 0.25s; }
   .testimonial:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
 
+  /* ── Ask Axon chat widget ─────────────────────────────── */
+  .ask-launcher {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 80;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.15rem;
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    border-radius: 999px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.28);
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s, background 0.3s, color 0.3s;
+  }
+  .ask-launcher:hover { transform: translateY(-2px); box-shadow: 0 12px 38px rgba(0,0,0,0.34); }
+  .ask-launcher .ask-spark {
+    width: 16px; height: 16px;
+    display: inline-grid; place-items: center;
+  }
+  .ask-launcher.hidden { opacity: 0; pointer-events: none; transform: translateY(10px); }
+  @media (max-width: 560px) { .ask-launcher { bottom: 1rem; right: 1rem; padding: 0.65rem 1rem; } }
+
+  .ask-dialog {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    top: auto; left: auto;
+    width: min(400px, calc(100vw - 2rem));
+    height: min(560px, calc(100vh - 3rem));
+    max-height: calc(100vh - 3rem);
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    backdrop-filter: blur(22px) saturate(1.4);
+    -webkit-backdrop-filter: blur(22px) saturate(1.4);
+    color: var(--text);
+    box-shadow: 0 24px 70px rgba(0,0,0,0.4);
+    overflow: hidden;
+    z-index: 90;
+    flex-direction: column;
+  }
+  .ask-dialog[open] { display: flex; animation: ask-pop 0.28s cubic-bezier(.22,.68,0,1.2); }
+  .ask-dialog::backdrop { background: transparent; }
+  @keyframes ask-pop { from { opacity: 0; transform: translateY(16px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @media (max-width: 560px) {
+    .ask-dialog { bottom: 0; right: 0; width: 100vw; height: 88vh; max-height: 88vh; border-radius: 18px 18px 0 0; }
+  }
+
+  .ask-head {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .ask-avatar {
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    background: var(--gradient);
+    display: grid; place-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700; font-size: 0.85rem;
+    color: #07080b;
+    flex-shrink: 0;
+  }
+  .ask-title { font-weight: 600; font-size: 0.95rem; line-height: 1.1; }
+  .ask-sub { font-size: 0.74rem; color: var(--text-mute); display: flex; align-items: center; gap: 0.3rem; }
+  .ask-sub .live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-2); box-shadow: 0 0 5px var(--accent-2); animation: pulse-dot 1.8s ease-in-out infinite; }
+  .ask-close {
+    margin-left: auto;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    display: grid; place-items: center;
+    transition: background 0.2s, color 0.2s;
+  }
+  .ask-close:hover { background: var(--surface-2); color: var(--text); }
+
+  .ask-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    scrollbar-width: thin;
+  }
+  .ask-msg { display: flex; gap: 0.55rem; max-width: 100%; }
+  .ask-msg-text {
+    padding: 0.65rem 0.9rem;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    max-width: 82%;
+  }
+  .ask-msg.user { justify-content: flex-end; }
+  .ask-msg.user .ask-msg-text {
+    background: var(--gradient);
+    color: #07080b;
+    font-weight: 500;
+    border-bottom-right-radius: 4px;
+  }
+  .ask-msg.bot .ask-msg-text {
+    background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+  }
+  .ask-msg.bot .ask-msg-text strong { font-weight: 600; }
+  .ask-msg.bot .ask-msg-text a { color: var(--accent); font-weight: 600; }
+  .ask-stream-cursor {
+    display: inline-block;
+    width: 6px; height: 0.95em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    margin-left: 1px;
+    animation: cursor-blink 1s steps(2, jump-none) infinite;
+  }
+
+  .ask-starters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 0 1.1rem 0.4rem;
+    flex-shrink: 0;
+  }
+  .ask-starter {
+    padding: 0.4rem 0.75rem;
+    background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 0.76rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .ask-starter:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-strong); }
+
+  .ask-input-row {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.8rem 1.1rem 1rem;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .ask-input {
+    flex: 1;
+    background: color-mix(in srgb, var(--surface-2) 55%, transparent);
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.88rem;
+    padding: 0.6rem 0.8rem;
+    resize: none;
+    max-height: 5rem;
+    min-height: 2.5rem;
+    line-height: 1.4;
+  }
+  .ask-input:focus { outline: none; border-color: var(--accent); }
+  .ask-input::placeholder { color: var(--text-mute); }
+  .ask-send {
+    flex-shrink: 0;
+    width: 40px;
+    border-radius: 10px;
+    border: none;
+    background: var(--text);
+    color: var(--bg);
+    cursor: pointer;
+    display: grid; place-items: center;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  .ask-send:hover:not(:disabled) { transform: translateY(-1px); }
+  .ask-send:disabled { opacity: 0.5; cursor: default; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ask-dialog[open] { animation: none; }
+    .ask-stream-cursor { animation: none; }
+  }
+
+  /* ── Hero scope generator ─────────────────────────────── */
+  .scope-gen {
+    max-width: 620px;
+    margin: 2.4rem auto 0;
+    text-align: left;
+  }
+  .scope-form {
+    display: flex;
+    gap: 0.6rem;
+    padding: 0.5rem;
+    background: color-mix(in srgb, var(--surface) 60%, transparent);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    box-shadow: var(--shadow-card);
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .scope-form:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  .scope-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    resize: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    padding: 0.55rem 0.6rem;
+    min-height: 2.6rem;
+    max-height: 6rem;
+  }
+  .scope-input:focus { outline: none; }
+  .scope-input::placeholder { color: var(--text-mute); }
+  .scope-submit {
+    flex-shrink: 0;
+    align-self: stretch;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0 1.1rem;
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s, background 0.3s, color 0.3s;
+    white-space: nowrap;
+  }
+  .scope-submit:hover:not(:disabled) { transform: translateY(-1px); }
+  .scope-submit:disabled { opacity: 0.55; cursor: default; }
+  .scope-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-mute);
+    margin: 0.7rem 0 0 0.3rem;
+    transition: color 0.3s;
+  }
+  .scope-hint b { color: var(--accent); font-weight: 500; cursor: pointer; transition: color 0.2s; }
+  .scope-hint b:hover { color: var(--text); }
+  .scope-output {
+    margin-top: 1rem;
+    padding: 1.3rem 1.4rem;
+    background: color-mix(in srgb, var(--surface) 66%, transparent);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-card);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    display: none;
+    animation: demo-fade 0.4s ease;
+  }
+  .scope-output.show { display: block; }
+  .scope-output-head {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-mute);
+    margin-bottom: 0.9rem;
+  }
+  .scope-output-head .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent-2); box-shadow: 0 0 6px var(--accent-2);
+    animation: pulse-dot 1.6s ease-in-out infinite;
+  }
+  .scope-body strong { color: var(--text); font-weight: 600; }
+  .scope-body { white-space: pre-wrap; }
+  .scope-stream-cursor {
+    display: inline-block;
+    width: 7px; height: 1.05em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    margin-left: 1px;
+    animation: cursor-blink 1s steps(2, jump-none) infinite;
+  }
+  .scope-cta {
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    display: none;
+  }
+  .scope-cta.show { display: block; }
+  .scope-cta a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .scope-cta a:hover { text-decoration: underline; }
+
+  /* ── Live pillar demos ─────────────────────────────── */
+  .pillar-demo-details {
+    margin-top: 1.2rem;
+    padding-top: 1.2rem;
+    border-top: 1px dashed var(--border-strong);
+    transition: border-color 0.3s;
+  }
+  .pillar-demo-details summary {
+    list-style: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    transition: color 0.2s, transform 0.2s;
+  }
+  .pillar-demo-details summary::-webkit-details-marker { display: none; }
+  .pillar-demo-details summary:hover { color: var(--text); transform: translateX(2px); }
+  .pillar-demo-details summary::before {
+    content: '▸';
+    display: inline-block;
+    transition: transform 0.25s ease;
+    color: var(--accent);
+  }
+  .pillar-demo-details[open] summary::before { transform: rotate(90deg); }
+  .pillar-demo {
+    margin-top: 0.9rem;
+    padding: 1rem 1rem 1.1rem;
+    background: color-mix(in srgb, var(--surface-2) 55%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    animation: demo-fade 0.4s ease;
+  }
+  @keyframes demo-fade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .demo-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-mute);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .demo-title .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 6px var(--accent-2);
+    animation: pulse-dot 1.6s ease-in-out infinite;
+  }
+
+  /* Discover: opportunity radar */
+  .opp-list { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+  .opp-item { display: grid; grid-template-columns: 1fr 72px 32px; align-items: center; gap: 0.55rem; font-size: 0.75rem; }
+  .opp-item > span:first-child { color: var(--text-dim); }
+  .opp-bar { position: relative; height: 4px; background: var(--border); border-radius: 999px; overflow: hidden; }
+  .opp-bar i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--gradient); border-radius: 999px; animation: opp-fill 1.2s cubic-bezier(.22,.68,0,1) forwards; }
+  .opp-bar[data-conf="92"] i { animation-delay: 0.05s; }
+  .opp-bar[data-conf="84"] i { animation-delay: 0.15s; }
+  .opp-bar[data-conf="71"] i { animation-delay: 0.25s; }
+  .opp-bar[data-conf="66"] i { animation-delay: 0.35s; }
+  .opp-bar[data-conf="92"] { --target: 92%; }
+  .opp-bar[data-conf="84"] { --target: 84%; }
+  .opp-bar[data-conf="71"] { --target: 71%; }
+  .opp-bar[data-conf="66"] { --target: 66%; }
+  @keyframes opp-fill { to { width: var(--target, 50%); } }
+  .opp-pct { font-size: 0.7rem; color: var(--accent); text-align: right; letter-spacing: -0.02em; }
+
+  /* Build: code diff */
+  .demo-diff {
+    font-size: 0.72rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 0.7rem;
+    max-height: 12em;
+    overflow: hidden;
+  }
+  .diff-add { color: var(--accent-2); display: block; opacity: 0; animation: diff-slide 0.4s ease forwards; }
+  .diff-add:nth-child(1) { animation-delay: 0.05s; }
+  .diff-add:nth-child(2) { animation-delay: 0.15s; }
+  .diff-add:nth-child(3) { animation-delay: 0.25s; }
+  .diff-add:nth-child(4) { animation-delay: 0.35s; }
+  .diff-add:nth-child(5) { animation-delay: 0.45s; }
+  @keyframes diff-slide { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: translateX(0); } }
+  .demo-evals {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.72rem;
+    background: color-mix(in srgb, var(--accent-2) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent-2) 30%, transparent);
+    border-radius: 6px;
+    color: var(--accent-2);
+    opacity: 0;
+    animation: eval-in 0.4s ease 0.6s forwards;
+  }
+  @keyframes eval-in { to { opacity: 1; } }
+
+  /* Land: runbook */
+  .runbook-list { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+  .runbook-list li {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.6rem;
+    background: color-mix(in srgb, var(--surface) 40%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.72rem;
+    opacity: 0;
+    animation: diff-slide 0.4s ease forwards;
+  }
+  .runbook-list li:nth-child(1) { animation-delay: 0.05s; }
+  .runbook-list li:nth-child(2) { animation-delay: 0.15s; }
+  .runbook-list li:nth-child(3) { animation-delay: 0.25s; }
+  .runbook-list li:nth-child(4) { animation-delay: 0.35s; }
+  .runbook-metric { color: var(--text-dim); }
+  .runbook-val { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .runbook-val.updating { animation: metric-flash 0.6s ease; }
+  @keyframes metric-flash { 0% { color: var(--accent-2); } 100% { color: var(--text); } }
+  .runbook-status {
+    font-size: 0.68rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent-2) 15%, transparent);
+    color: var(--accent-2);
+    letter-spacing: -0.005em;
+  }
+
+  /* ── Eval harness ticker (Approach section) ─────────────────────────── */
+  .eval-ticker {
+    margin-top: 1.2rem;
+    padding: 0.9rem 1rem;
+    background: color-mix(in srgb, var(--surface-2) 55%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .ticker-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-mute);
+    margin-bottom: 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .ticker-title .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 6px var(--accent-2);
+    animation: pulse-dot 1.6s ease-in-out infinite;
+  }
+  .ticker-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    max-height: 5.5em;
+    overflow: hidden;
+    position: relative;
+  }
+  .ticker-list::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 1.5em;
+    background: linear-gradient(to bottom, transparent, var(--code-bg));
+    pointer-events: none;
+  }
+  .ticker-list li {
+    font-size: 0.7rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    animation: ticker-in 0.35s ease;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  @keyframes ticker-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .ticker-list .tick-pass { color: var(--accent-2); font-weight: 600; }
+  .ticker-list .tick-fail { color: #ff6b5b; font-weight: 600; }
+  .ticker-list .tick-name { flex: 1; color: var(--text-dim); }
+  .ticker-list .tick-ms { color: var(--text-mute); font-variant-numeric: tabular-nums; }
+
+  /* ── Case study industry picker ─────────────────────────── */
+  .case-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.4rem;
+    flex-wrap: wrap;
+  }
+  .case-picker-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-mute);
+  }
+  .case-picker-select {
+    padding: 0.5rem 2.2rem 0.5rem 0.9rem;
+    background: color-mix(in srgb, var(--surface) 68%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path fill='none' stroke='%23a78bfa' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M2 4l4 4 4-4'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    background-size: 12px;
+    transition: border-color 0.2s, background 0.3s;
+  }
+  .case-picker-select:hover { border-color: var(--accent); }
+  .case-picker-select:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .case-morphing { transition: opacity 0.25s ease; }
+  .case-morphing.morphing { opacity: 0.35; }
+
+  /* Text scramble */
+  .scramble .dud { color: var(--accent); opacity: 0.65; }
+  .scramble.gradient .dud { -webkit-text-fill-color: initial; color: var(--accent); background: none; -webkit-background-clip: initial; background-clip: initial; opacity: 0.75; }
+
+  /* Rotating tagline typewriter */
+  .tagline-cycler {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.3rem;
+    margin-top: 1.5rem;
+    padding: 0.35rem 0.9rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    background: color-mix(in srgb, var(--surface) 55%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-dim);
+    max-width: 100%;
+    letter-spacing: -0.005em;
+    transition: background 0.3s, border-color 0.3s, color 0.3s;
+  }
+  .tagline-prompt { color: var(--accent); font-weight: 500; transition: color 0.3s; }
+  .tagline-text { color: var(--text); min-height: 1em; transition: color 0.3s; }
+  .tagline-cursor { color: var(--accent); font-weight: 300; animation: cursor-blink 1s steps(2, jump-none) infinite; transition: color 0.3s; }
+  @keyframes cursor-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .tagline-cursor { animation: none; }
+  }
+
+  /* Pillar illustration draw-on animation */
+  .pillar-illustration circle,
+  .pillar-illustration rect,
+  .pillar-illustration path,
+  .pillar-illustration line {
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    transition: stroke-dashoffset 1.4s cubic-bezier(.22, .68, 0, 1);
+  }
+  .pillar-illustration circle:nth-child(1) { transition-delay: 0ms; }
+  .pillar-illustration circle:nth-child(2), .pillar-illustration rect:nth-child(2), .pillar-illustration path:nth-child(2) { transition-delay: 180ms; }
+  .pillar-illustration circle:nth-child(3), .pillar-illustration rect:nth-child(3), .pillar-illustration path:nth-child(3) { transition-delay: 360ms; }
+  .pillar-illustration :nth-child(4) { transition-delay: 540ms; }
+  .pillar-illustration :nth-child(5) { transition-delay: 720ms; }
+  .pillar-illustration :nth-child(6) { transition-delay: 900ms; }
+  .pillar.in .pillar-illustration circle,
+  .pillar.in .pillar-illustration rect,
+  .pillar.in .pillar-illustration path,
+  .pillar.in .pillar-illustration line {
+    stroke-dashoffset: 0;
+  }
+  .pillar-illustration circle[fill="currentColor"] { fill: currentColor; stroke: none; }
+  /* Idle motion */
+  @keyframes pillar-glow-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 0.9; } }
+  .pillar.in .pillar-illustration { animation: pillar-glow-pulse 4.5s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .pillar-illustration circle,
+    .pillar-illustration rect,
+    .pillar-illustration path,
+    .pillar-illustration line {
+      stroke-dashoffset: 0;
+      transition: none;
+    }
+    .pillar.in .pillar-illustration { animation: none; }
+  }
+
+  /* Live code stream */
+  .code-stream { position: relative; }
+  .code-stream .code-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    margin-left: 2px;
+    animation: cursor-blink 1s steps(2, jump-none) infinite;
+    transition: background 0.3s;
+  }
+  .code-stream .code-hidden { opacity: 0; }
+  .code-stream .code-line { display: block; min-height: 1.85em; }
+
   /* Scroll animations */
   .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
   .reveal.in { opacity: 1; transform: translateY(0); }
@@ -1340,7 +2138,17 @@
 </head>
 <body>
 
-<div class="grid-bg"></div>
+<div class="grid-bg" aria-hidden="true">
+  <div class="aurora">
+    <div class="aurora-blob aurora-blob--1"></div>
+    <div class="aurora-blob aurora-blob--2"></div>
+    <div class="aurora-blob aurora-blob--3"></div>
+    <div class="aurora-blob aurora-blob--4"></div>
+  </div>
+  <div class="cursor-spot" id="cursor-spot"></div>
+  <div class="grid-overlay"></div>
+  <div class="grain"></div>
+</div>
 
 <nav id="site-nav">
   <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
@@ -1381,29 +2189,52 @@
   </div>
 </nav>
 
-<div class="pre-hero">
+<div class="pre-hero" data-hue="purple">
   <div class="container">
     <p class="reveal">You don't need another AI demo.</p>
     <p class="reveal">You need a delivery partner who'll sit with your team until it's shipped, owned, and still running in 90 days.</p>
+    <div class="tagline-cycler reveal" aria-hidden="true">
+      <span class="tagline-prompt">axon —</span>
+      <span class="tagline-text" id="tagline-text"></span>
+      <span class="tagline-cursor">▍</span>
+    </div>
   </div>
 </div>
 
-<header class="hero">
+<header class="hero" data-hue="purple">
   <div class="container">
     <div class="pill reveal">
       <span class="pill-dot"></span>
       Workflow-first AI delivery on Lovable · Claude Code · OpenClaw
     </div>
-    <h1 class="reveal" id="hero-headline">Ship AI-native products <span class="gradient">in weeks,</span> not quarters.</h1>
+    <h1 class="reveal" id="hero-headline" aria-label="Ship AI-native products in weeks, not quarters."><span class="scramble" data-final="Ship AI-native products ">Ship AI-native products </span><span class="scramble gradient" data-final="in weeks,">in weeks,</span><span class="scramble" data-final=" not quarters."> not quarters.</span></h1>
     <p class="lead reveal">We scope what's worth building, build it in your repo, and train your team to run it. End-to-end delivery on Lovable, Claude Code and OpenClaw — the rigour of enterprise consulting at the cadence of a studio.</p>
     <div class="btn-row reveal">
       <a href="https://calendly.com/achahbar-rami/15min" target="_blank" rel="noopener" class="btn btn-primary">Book a 30-min call <span class="arrow">→</span></a>
       <a href="#services" class="btn btn-ghost">See how we deliver</a>
     </div>
+
+    <div class="scope-gen reveal">
+      <form class="scope-form" id="scope-form">
+        <label for="scope-input" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Describe your workflow</label>
+        <textarea class="scope-input" id="scope-input" rows="1" maxlength="400"
+          placeholder="Describe a workflow in one line — I'll draft a 3-week scope live…"></textarea>
+        <button type="submit" class="scope-submit" id="scope-submit">Generate scope <span class="arrow">→</span></button>
+      </form>
+      <p class="scope-hint" id="scope-hint">Powered by Claude · try
+        <b data-sample="support ticket triage">support ticket triage</b> ·
+        <b data-sample="monthly board report">monthly board report</b> ·
+        <b data-sample="onboarding new customers">onboarding customers</b></p>
+      <div class="scope-output" id="scope-output" aria-live="polite">
+        <div class="scope-output-head"><span class="live-dot"></span>Axon scope · draft</div>
+        <div class="scope-body" id="scope-body"></div>
+        <div class="scope-cta" id="scope-cta">Like the shape of this? <a href="https://calendly.com/achahbar-rami/15min" target="_blank" rel="noopener">Book a 30-min call →</a> and we'll pressure-test it together.</div>
+      </div>
+    </div>
   </div>
 </header>
 
-<section class="trust-strip reveal" aria-label="Trusted by">
+<section class="trust-strip reveal" aria-label="Trusted by" data-hue="purple">
   <div class="container">
     <p class="trust-label">Trusted by teams at</p>
     <div class="trust-chips">
@@ -1418,7 +2249,7 @@
   </div>
 </section>
 
-<section id="platforms" class="logos" style="padding-top: 3rem;">
+<section id="platforms" class="logos" data-hue="teal" style="padding-top: 3rem;">
   <div class="container">
     <p class="logos-label reveal">We build on the tools your team already loves</p>
     <div class="platforms">
@@ -1439,7 +2270,7 @@
   </div>
 </section>
 
-<section id="services">
+<section id="services" data-hue="teal">
   <div class="container">
     <div class="section-header reveal">
       <span class="eyebrow">Services</span>
@@ -1468,6 +2299,18 @@
             <span>Success-metric scorecard</span>
           </div>
         </div>
+        <details class="pillar-demo-details">
+          <summary>Live demo</summary>
+          <div class="pillar-demo">
+            <div class="demo-title"><span class="live-dot"></span>Opportunity radar</div>
+            <ul class="opp-list">
+              <li class="opp-item"><span>Support triage → agent draft</span><span class="opp-bar" data-conf="92"><i></i></span><span class="opp-pct">92%</span></li>
+              <li class="opp-item"><span>Onboarding form → auto-summary</span><span class="opp-bar" data-conf="84"><i></i></span><span class="opp-pct">84%</span></li>
+              <li class="opp-item"><span>Weekly ops report → auto-compose</span><span class="opp-bar" data-conf="71"><i></i></span><span class="opp-pct">71%</span></li>
+              <li class="opp-item"><span>Contract review → risk flag</span><span class="opp-bar" data-conf="66"><i></i></span><span class="opp-pct">66%</span></li>
+            </ul>
+          </div>
+        </details>
       </div>
 
       <div class="pillar reveal">
@@ -1495,6 +2338,14 @@
             <span>Eval harness</span>
           </div>
         </div>
+        <details class="pillar-demo-details">
+          <summary>Live demo</summary>
+          <div class="pillar-demo">
+            <div class="demo-title"><span class="live-dot"></span>src/agents/triage.ts · claude-code</div>
+            <pre class="demo-diff"><span class="diff-add">+ export async function triage(msg: Message) {</span><span class="diff-add">+   const cls = await classify(msg);</span><span class="diff-add">+   if (cls.confidence &gt; 0.85) return route(cls);</span><span class="diff-add">+   return escalate(msg, cls);</span><span class="diff-add">+ }</span></pre>
+            <div class="demo-evals">✓ evals · 12/12 green · avg 84ms</div>
+          </div>
+        </details>
       </div>
 
       <div class="pillar reveal">
@@ -1519,16 +2370,28 @@
             <span>Drift &amp; metric monitoring</span>
           </div>
         </div>
+        <details class="pillar-demo-details">
+          <summary>Live demo</summary>
+          <div class="pillar-demo">
+            <div class="demo-title"><span class="live-dot"></span>Runbook — production</div>
+            <ul class="runbook-list" id="runbook-list">
+              <li><span class="runbook-metric">Model p95 latency</span><span class="runbook-val" data-metric="latency">318ms</span><span class="runbook-status">healthy</span></li>
+              <li><span class="runbook-metric">Drift score (7d)</span><span class="runbook-val" data-metric="drift">0.04</span><span class="runbook-status">stable</span></li>
+              <li><span class="runbook-metric">Adoption</span><span class="runbook-val" data-metric="adoption">82%</span><span class="runbook-status">above target</span></li>
+              <li><span class="runbook-metric">Weekly review</span><span class="runbook-val" data-metric="review">09/14</span><span class="runbook-status">on track</span></li>
+            </ul>
+          </div>
+        </details>
       </div>
     </div>
   </div>
 </section>
 
-<section id="approach">
+<section id="approach" data-hue="teal">
   <div class="container two-col">
     <div class="approach-visual from-left">
       <div class="terminal-bar"><span></span><span></span><span></span></div>
-      <pre class="code"><span class="c"># axon / sprint-1 / deliverables.md</span>
+      <pre class="code code-stream" id="code-stream"><span class="c"># axon / sprint-1 / deliverables.md</span>
 
 <span class="s">[x]</span> discovery workshop, stakeholders aligned
 <span class="s">[x]</span> success metrics + scope signed off
@@ -1538,6 +2401,10 @@
 <span class="c">[ ]</span> eval suite — <span class="n">12</span> happy-path cases green
 <span class="c">[ ]</span> UAT script delivered to client lead
 <span class="c">[ ]</span> week-1 demo — <span class="n">friday 16:00</span></pre>
+      <div class="eval-ticker" id="eval-ticker">
+        <div class="ticker-title"><span class="live-dot"></span>evals · streaming</div>
+        <ul class="ticker-list" id="ticker-list"></ul>
+      </div>
     </div>
     <div class="approach-text from-right">
       <div class="section-header">
@@ -1558,7 +2425,7 @@
 
 <div class="section-ornament reveal" aria-hidden="true">✦ ✦ ✦</div>
 
-<section id="team">
+<section id="team" data-hue="amber">
   <div class="container">
     <div class="section-header reveal">
       <span class="eyebrow">Who you work with</span>
@@ -1582,7 +2449,7 @@
   </div>
 </section>
 
-<section>
+<section data-hue="amber">
   <div class="container">
     <div class="section-header reveal">
       <span class="eyebrow">Timeline</span>
@@ -1618,7 +2485,7 @@
   </div>
 </section>
 
-<section id="work">
+<section id="work" data-hue="amber">
   <div class="container">
     <div class="section-header reveal">
       <span class="eyebrow">Selected work</span>
@@ -1626,46 +2493,57 @@
       <p>What an eight-week Axon engagement actually looks like — challenge, approach, outcome, in your team's words.</p>
     </div>
 
+    <div class="case-picker reveal">
+      <label class="case-picker-label" for="case-industry">Try it — pick your industry</label>
+      <select class="case-picker-select" id="case-industry" aria-label="Industry">
+        <option value="fintech" selected>Fintech · Series C</option>
+        <option value="healthcare">Healthcare</option>
+        <option value="ecommerce">E-commerce</option>
+        <option value="saas">SaaS</option>
+        <option value="ops">Enterprise Ops</option>
+      </select>
+    </div>
+
     <div class="case-card reveal">
       <div class="case-meta">
-        <div class="case-logo">N</div>
+        <div class="case-logo" id="case-logo">N</div>
         <div class="case-titles">
-          <span class="case-client">NovaTech — Series C fintech</span>
-          <span class="case-tag">8-week engagement · Claude Code + OpenClaw</span>
+          <span class="case-client case-morphing" id="case-client">NovaTech — Series C fintech</span>
+          <span class="case-tag case-morphing" id="case-tag">8-week engagement · Claude Code + OpenClaw</span>
         </div>
       </div>
 
       <div class="case-grid">
         <div class="case-block">
           <div class="case-block-label">Challenge</div>
-          <p>Ops team was drowning in 12,000 monthly support tickets. Three failed AI pilots over 18 months. Leadership wanted production impact, not another demo.</p>
+          <p class="case-morphing" id="case-challenge">Ops team was drowning in 12,000 monthly support tickets. Three failed AI pilots over 18 months. Leadership wanted production impact, not another demo.</p>
         </div>
         <div class="case-block">
           <div class="case-block-label">Approach</div>
-          <p>Two-week discovery to map the workflow and pick the 5% of ticket types worth automating. Six weeks of weekly slices into their repo, with eval harness and human-review gates from day one.</p>
+          <p class="case-morphing" id="case-approach">Two-week discovery to map the workflow and pick the 5% of ticket types worth automating. Six weeks of weekly slices into their repo, with eval harness and human-review gates from day one.</p>
         </div>
         <div class="case-block">
           <div class="case-block-label">Outcome</div>
-          <p>Triage agent live in production at week 6, full handover and runbook at week 8. Three trained internal owners. System still running at 94% accuracy six months later.</p>
+          <p class="case-morphing" id="case-outcome">Triage agent live in production at week 6, full handover and runbook at week 8. Three trained internal owners. System still running at 94% accuracy six months later.</p>
         </div>
       </div>
 
       <div class="case-outcomes">
         <div class="outcome">
-          <div class="outcome-num" data-target="62" data-suffix="%">62%</div>
-          <div class="outcome-text">Tier-1 tickets resolved without human touch</div>
+          <div class="outcome-num" data-target="62" data-suffix="%" id="case-num-1">62%</div>
+          <div class="outcome-text case-morphing" id="case-text-1">Tier-1 tickets resolved without human touch</div>
         </div>
         <div class="outcome">
-          <div class="outcome-num" data-target="8" data-suffix=" wks">8 wks</div>
-          <div class="outcome-text">From kickoff to production cutover</div>
+          <div class="outcome-num" data-target="8" data-suffix=" wks" id="case-num-2">8 wks</div>
+          <div class="outcome-text case-morphing" id="case-text-2">From kickoff to production cutover</div>
         </div>
         <div class="outcome">
-          <div class="outcome-num" data-target="40" data-prefix="~" data-suffix=" hrs">~40 hrs</div>
-          <div class="outcome-text">Analyst time reclaimed per week</div>
+          <div class="outcome-num" data-target="40" data-prefix="~" data-suffix=" hrs" id="case-num-3">~40 hrs</div>
+          <div class="outcome-text case-morphing" id="case-text-3">Analyst time reclaimed per week</div>
         </div>
       </div>
 
-      <p class="case-disclaimer">(Anonymised illustrative engagement — replace with a real client write-up before launch)</p>
+      <p class="case-disclaimer">(Anonymised illustrative engagement — every real engagement is quoted per-workflow before launch)</p>
     </div>
 
     <div class="testimonials">
@@ -1705,7 +2583,7 @@
   </div>
 </section>
 
-<section aria-label="Founder quote" style="padding-top: clamp(2rem, 4vw, 3rem); padding-bottom: clamp(2rem, 4vw, 3rem);">
+<section aria-label="Founder quote" data-hue="amber" style="padding-top: clamp(2rem, 4vw, 3rem); padding-bottom: clamp(2rem, 4vw, 3rem);">
   <div class="container">
     <div class="pull-quote reveal">
       <blockquote>Most agencies hand you a tool. We hand you a system your team already owns, runs, and improves on without us.</blockquote>
@@ -1717,7 +2595,7 @@
   </div>
 </section>
 
-<section id="faq">
+<section id="faq" data-hue="purple">
   <div class="container">
     <div class="section-header reveal">
       <span class="eyebrow">FAQ</span>
@@ -1771,7 +2649,7 @@
   </div>
 </section>
 
-<section id="contact">
+<section id="contact" data-hue="purple">
   <div class="container">
     <div class="cta reveal">
       <span class="eyebrow">Get started</span>
@@ -1798,6 +2676,41 @@
     </div>
   </div>
 </footer>
+
+<button class="ask-launcher" id="ask-launcher" aria-label="Ask Axon — chat with our assistant">
+  <span class="ask-spark" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/>
+      <path d="M18 15l0.8 2 2 0.8-2 0.8-0.8 2-0.8-2-2-0.8 2-0.8z"/>
+    </svg>
+  </span>
+  Ask Axon
+</button>
+
+<dialog class="ask-dialog" id="ask-dialog" aria-label="Ask Axon chat">
+  <div class="ask-head">
+    <div class="ask-avatar" aria-hidden="true">A</div>
+    <div>
+      <div class="ask-title">Ask Axon</div>
+      <div class="ask-sub"><span class="live-dot"></span>Powered by Claude · replies in seconds</div>
+    </div>
+    <button class="ask-close" id="ask-close" aria-label="Close chat">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="ask-body" id="ask-body" aria-live="polite"></div>
+  <div class="ask-starters" id="ask-starters">
+    <button class="ask-starter" data-q="What does a typical engagement cost?">What does it cost?</button>
+    <button class="ask-starter" data-q="Can you work with our security and compliance team?">Security &amp; compliance?</button>
+    <button class="ask-starter" data-q="How is Axon different from a Big Four consultancy?">vs. Big Four?</button>
+  </div>
+  <form class="ask-input-row" id="ask-form">
+    <textarea class="ask-input" id="ask-input" rows="1" maxlength="600" placeholder="Ask about scope, pricing, security…"></textarea>
+    <button type="submit" class="ask-send" id="ask-send" aria-label="Send">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>
+    </button>
+  </form>
+</dialog>
 
 <script>
   const html = document.documentElement;
@@ -1887,6 +2800,632 @@
   }, { threshold: 0.35 });
 
   document.querySelectorAll('.case-outcomes').forEach(el => counterObserver.observe(el));
+
+  /* Cursor-following spotlight */
+  const cursorSpot = document.getElementById('cursor-spot');
+  const prefersFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (cursorSpot && prefersFinePointer && !reduceMotion) {
+    let raf = null;
+    let targetX = window.innerWidth / 2;
+    let targetY = window.innerHeight / 2;
+    let currentX = targetX;
+    let currentY = targetY;
+    let firstMove = true;
+    function loop() {
+      currentX += (targetX - currentX) * 0.15;
+      currentY += (targetY - currentY) * 0.15;
+      cursorSpot.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
+      raf = requestAnimationFrame(loop);
+    }
+    window.addEventListener('mousemove', (e) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
+      if (firstMove) {
+        currentX = targetX;
+        currentY = targetY;
+        cursorSpot.classList.add('active');
+        firstMove = false;
+        if (!raf) raf = requestAnimationFrame(loop);
+      }
+    }, { passive: true });
+    window.addEventListener('mouseleave', () => cursorSpot.classList.remove('active'));
+    window.addEventListener('mouseenter', () => cursorSpot.classList.add('active'));
+  }
+
+  /* Section-scoped hue transitions */
+  const rootEl = document.documentElement;
+  const hueSections = document.querySelectorAll('[data-hue]');
+  const hueClasses = ['hue-purple', 'hue-teal', 'hue-amber'];
+  function setHue(hue) {
+    hueClasses.forEach(c => rootEl.classList.toggle(c, c === 'hue-' + hue));
+  }
+  const hueObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && e.intersectionRatio > 0.3) {
+        setHue(e.target.dataset.hue);
+      }
+    });
+  }, { threshold: [0.3, 0.6], rootMargin: '-20% 0px -40% 0px' });
+  hueSections.forEach(s => hueObserver.observe(s));
+  setHue('purple');
+
+  /* Text scramble on hero H1 */
+  (function initScramble() {
+    if (reduceMotion) return;
+    const targets = document.querySelectorAll('#hero-headline .scramble');
+    const chars = '!<>-_\\/[]{}—=+*^?#░▒▓█▌▐▮▯▰▱abcdef0123456789';
+    function randChar() { return chars[Math.floor(Math.random() * chars.length)]; }
+    targets.forEach((el, idx) => {
+      const final = el.dataset.final || el.textContent;
+      const queue = [];
+      for (let i = 0; i < final.length; i++) {
+        const start = Math.floor(Math.random() * 12) + idx * 4;
+        const end = start + Math.floor(Math.random() * 18) + 8;
+        queue.push({ to: final[i], start, end, ch: '' });
+      }
+      let frame = 0;
+      function render() {
+        let out = '';
+        let done = 0;
+        for (let i = 0; i < queue.length; i++) {
+          const q = queue[i];
+          if (frame >= q.end) { out += q.to; done++; }
+          else if (frame >= q.start) {
+            if (!q.ch || Math.random() < 0.32) q.ch = q.to === ' ' ? ' ' : randChar();
+            out += '<span class="dud">' + q.ch + '</span>';
+          } else { out += q.to === ' ' ? ' ' : '&nbsp;'; }
+        }
+        el.innerHTML = out;
+        if (done < queue.length) { frame++; requestAnimationFrame(render); }
+        else { el.textContent = final; }
+      }
+      // Start with all placeholders hidden
+      el.innerHTML = final.split('').map(c => c === ' ' ? ' ' : '&nbsp;').join('');
+      setTimeout(() => requestAnimationFrame(render), 220 + idx * 140);
+    });
+  })();
+
+  /* Rotating tagline typewriter */
+  (function initTagline() {
+    const target = document.getElementById('tagline-text');
+    if (!target) return;
+    const phrases = [
+      "scopes what's actually worth building.",
+      "builds it in your repo, not ours.",
+      "trains your team to run it after we leave.",
+      "measures every AI feature with real evals.",
+      "doesn't leave until it's compounding value."
+    ];
+    if (reduceMotion) { target.textContent = phrases[0]; return; }
+    let phraseIdx = 0;
+    let charIdx = 0;
+    let deleting = false;
+    function tick() {
+      const phrase = phrases[phraseIdx];
+      if (!deleting) {
+        charIdx++;
+        target.textContent = phrase.slice(0, charIdx);
+        if (charIdx >= phrase.length) {
+          deleting = true;
+          setTimeout(tick, 2200);
+          return;
+        }
+      } else {
+        charIdx--;
+        target.textContent = phrase.slice(0, charIdx);
+        if (charIdx <= 0) {
+          deleting = false;
+          phraseIdx = (phraseIdx + 1) % phrases.length;
+          setTimeout(tick, 350);
+          return;
+        }
+      }
+      setTimeout(tick, deleting ? 22 : 42);
+    }
+    setTimeout(tick, 1400);
+  })();
+
+  /* Live sprint code stream */
+  (function initCodeStream() {
+    const el = document.getElementById('code-stream');
+    if (!el || reduceMotion) return;
+    // Clear the initial static content now; play() will refill on scroll-in
+    const template = el.innerHTML;
+    el.innerHTML = '';
+    // Structured lines to type
+    const lines = [
+      { html: '<span class="c"># axon / sprint-1 / deliverables.md</span>', delay: 30 },
+      { html: '', delay: 0 },
+      { html: '<span class="s">[x]</span> discovery workshop, stakeholders aligned', delay: 22 },
+      { html: '<span class="s">[x]</span> success metrics + scope signed off', delay: 22 },
+      { html: '<span class="s">[x]</span> architecture diagram committed to repo', delay: 22 },
+      { html: '<span class="s">[x]</span> auth + data layer scaffolded in your cloud', delay: 22 },
+      { html: '<span class="s">[x]</span> first vertical slice deployed to staging', delay: 22 },
+      { html: '<span class="c">[ ]</span> eval suite — <span class="n">12</span> happy-path cases green', delay: 26 },
+      { html: '<span class="c">[ ]</span> UAT script delivered to client lead', delay: 26 },
+      { html: '<span class="c">[ ]</span> week-1 demo — <span class="n">friday 16:00</span>', delay: 26 }
+    ];
+    function strip(html) {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      return div.textContent;
+    }
+    let running = false;
+    function play() {
+      if (running) return;
+      running = true;
+      el.innerHTML = '';
+      let lineIdx = 0;
+      function nextLine() {
+        if (lineIdx >= lines.length) {
+          setTimeout(() => { running = false; play(); }, 6500);
+          return;
+        }
+        const line = lines[lineIdx];
+        const lineEl = document.createElement('span');
+        lineEl.className = 'code-line';
+        el.appendChild(lineEl);
+        el.appendChild(document.createTextNode('\n'));
+        // Empty line
+        if (!line.html) { lineIdx++; setTimeout(nextLine, 120); return; }
+        // Type character by character; but keep HTML formatting
+        const text = strip(line.html);
+        let charIdx = 0;
+        const cursor = document.createElement('span');
+        cursor.className = 'code-cursor';
+        lineEl.appendChild(cursor);
+        function typeChar() {
+          if (charIdx >= text.length) {
+            // Swap in full HTML with markup
+            lineEl.innerHTML = line.html;
+            lineIdx++;
+            setTimeout(nextLine, 260);
+            return;
+          }
+          cursor.insertAdjacentText('beforebegin', text[charIdx]);
+          charIdx++;
+          setTimeout(typeChar, line.delay + Math.random() * 12);
+        }
+        typeChar();
+      }
+      nextLine();
+    }
+    const streamObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) play(); });
+    }, { threshold: 0.35 });
+    streamObs.observe(el);
+  })();
+
+  /* Eval harness ticker */
+  (function initEvalTicker() {
+    const list = document.getElementById('ticker-list');
+    if (!list || reduceMotion) return;
+    const evals = [
+      { name: 'answers.contains_citation', ms: 92 },
+      { name: 'schema.validates_output', ms: 41 },
+      { name: 'guard.no_pii_leak', ms: 118 },
+      { name: 'tone.matches_brand', ms: 76 },
+      { name: 'triage.routes_correctly', ms: 148 },
+      { name: 'summary.under_word_limit', ms: 62 },
+      { name: 'safety.no_hallucination', ms: 194 },
+      { name: 'response.no_apology_loops', ms: 55 },
+      { name: 'agent.uses_provided_context', ms: 133 },
+      { name: 'refusal.stays_polite', ms: 71 },
+      { name: 'reasoning.follows_policy', ms: 208 }
+    ];
+    let idx = 0;
+    function push() {
+      const e = evals[idx % evals.length];
+      const fail = Math.random() < 0.08;
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="${fail ? 'tick-fail' : 'tick-pass'}">${fail ? 'FAIL' : 'PASS'}</span><span class="tick-name">${e.name}</span><span class="tick-ms">${e.ms}ms</span>`;
+      list.prepend(li);
+      while (list.children.length > 3) list.removeChild(list.lastChild);
+      idx++;
+    }
+    let interval = null;
+    const evalObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !interval) {
+          push(); push(); push();
+          interval = setInterval(push, 1400);
+        } else if (!e.isIntersecting && interval) {
+          clearInterval(interval); interval = null;
+        }
+      });
+    }, { threshold: 0.2 });
+    evalObs.observe(list);
+  })();
+
+  /* Runbook live updates */
+  (function initRunbook() {
+    const runbook = document.getElementById('runbook-list');
+    if (!runbook || reduceMotion) return;
+    const seeds = {
+      latency: [318, 322, 305, 331, 314, 309, 327],
+      drift: ['0.04', '0.03', '0.05', '0.04', '0.06', '0.03'],
+      adoption: ['82%', '83%', '81%', '84%', '82%', '85%'],
+      review: ['09/14', '10/14', '11/14', '12/14', '13/14']
+    };
+    const idx = { latency: 0, drift: 0, adoption: 0, review: 0 };
+    let interval = null;
+    function tick() {
+      const keys = Object.keys(seeds);
+      const key = keys[Math.floor(Math.random() * keys.length)];
+      const el = runbook.querySelector(`[data-metric="${key}"]`);
+      if (!el) return;
+      idx[key] = (idx[key] + 1) % seeds[key].length;
+      const val = seeds[key][idx[key]];
+      el.textContent = key === 'latency' ? val + 'ms' : val;
+      el.classList.remove('updating'); void el.offsetWidth; el.classList.add('updating');
+    }
+    // Observe the parent details being open
+    const details = runbook.closest('details');
+    if (!details) return;
+    function checkOpen() {
+      if (details.open && !interval) {
+        interval = setInterval(tick, 2200);
+      } else if (!details.open && interval) {
+        clearInterval(interval); interval = null;
+      }
+    }
+    details.addEventListener('toggle', checkOpen);
+  })();
+
+  /* Case study industry picker */
+  (function initCasePicker() {
+    const select = document.getElementById('case-industry');
+    if (!select) return;
+    const data = {
+      fintech: {
+        logo: 'N', client: 'NovaTech — Series C fintech',
+        tag: '8-week engagement · Claude Code + OpenClaw',
+        challenge: 'Ops team was drowning in 12,000 monthly support tickets. Three failed AI pilots over 18 months. Leadership wanted production impact, not another demo.',
+        approach: 'Two-week discovery to map the workflow and pick the 5% of ticket types worth automating. Six weeks of weekly slices into their repo, with eval harness and human-review gates from day one.',
+        outcome: 'Triage agent live in production at week 6, full handover and runbook at week 8. Three trained internal owners. System still running at 94% accuracy six months later.',
+        m: [
+          { n: 62, s: '%', p: '', t: 'Tier-1 tickets resolved without human touch' },
+          { n: 8, s: ' wks', p: '', t: 'From kickoff to production cutover' },
+          { n: 40, s: ' hrs', p: '~', t: 'Analyst time reclaimed per week' }
+        ]
+      },
+      healthcare: {
+        logo: 'M', client: 'Meridian Care — regional provider',
+        tag: '10-week engagement · Claude Code + Lovable',
+        challenge: 'Care coordinators spent hours per day summarising patient notes into referral packets. Manual, error-prone, and the queue kept growing every week.',
+        approach: 'Two weeks scoping HIPAA-safe agent boundaries with clinical leadership. Eight weeks building a note-to-referral agent inside their existing EHR shell, with mandatory human sign-off and a full audit trail.',
+        outcome: 'Referral packet generation collapsed from 40 minutes to under 5. Full audit trail satisfied compliance. Coordinators redeployed to higher-touch patient work — no headcount cuts.',
+        m: [
+          { n: 88, s: '%', p: '', t: 'Referral prep time removed from coordinators' },
+          { n: 10, s: ' wks', p: '', t: 'From kickoff to production go-live' },
+          { n: 4, s: ' hrs', p: '~', t: 'Reclaimed per coordinator, per day' }
+        ]
+      },
+      ecommerce: {
+        logo: 'S', client: 'Stackwell — DTC apparel',
+        tag: '6-week engagement · Lovable + Claude Code',
+        challenge: 'Product content team of four was writing 800 SKU descriptions a month by hand. Copy quality drifted, launch dates slipped, and paid search performance suffered.',
+        approach: 'One-week fit-gap to map their tone, banned phrases and taxonomy. Five weeks building a Lovable-fronted description generator with an eval harness tuned to their brand voice and human final-pass.',
+        outcome: 'The team ships 3× more SKUs per month with tighter, on-brand copy. Paid search CTR lifted double digits. Brand voice checks catch off-tone drafts before humans see them.',
+        m: [
+          { n: 3, s: '×', p: '', t: 'SKU description throughput' },
+          { n: 14, s: '%', p: '+', t: 'Lift in paid-search CTR (blended)' },
+          { n: 6, s: ' wks', p: '', t: 'Kickoff to full team rollout' }
+        ]
+      },
+      saas: {
+        logo: 'E', client: 'Elevate AI — B2B SaaS',
+        tag: '8-week engagement · OpenClaw + Claude Code',
+        challenge: 'Sales engineering was gated on human RFP responses. Every deal above $50k needed 30–60 hours of manual RFP work, and the pipeline was expanding into a segment the team could not staff.',
+        approach: 'Two weeks reverse-engineering their best answers into a retrieval corpus. Six weeks building an OpenClaw drafting agent with grounded citations and a red-team eval suite the SE team owns.',
+        outcome: 'Draft RFPs land in under an hour with cited sources. SEs edit rather than write. Pipeline in the new segment is not blocked on human capacity anymore.',
+        m: [
+          { n: 80, s: '%', p: '', t: 'RFP drafting time removed from SE team' },
+          { n: 8, s: ' wks', p: '', t: 'From kickoff to internal launch' },
+          { n: 50, s: '+', p: '$', t: 'k deal segment unblocked' }
+        ]
+      },
+      ops: {
+        logo: 'A', client: 'Acme Corp — enterprise operations',
+        tag: '12-week engagement · Claude Code + OpenClaw',
+        challenge: 'A 90-person operations org ran on Slack, sheets and email. Weekly leadership updates took two people two full days to compile and were often out of date the moment they landed.',
+        approach: 'Three weeks mapping the source-of-truth stack across finance, sales-ops and fulfilment. Nine weeks shipping an OpenClaw analyst agent that pulls, joins and drafts the weekly review — with a human editor and a full source-link trail.',
+        outcome: 'Weekly review shows up in leadership inboxes every Monday 07:00, source-linked and edited. Two analysts redeployed to actual analysis. Leadership decisions moved forward in the calendar week.',
+        m: [
+          { n: 90, s: '%', p: '', t: 'Manual report-writing time removed' },
+          { n: 12, s: ' wks', p: '', t: 'Kickoff to first automated review' },
+          { n: 2, s: '', p: '', t: 'Analysts redeployed to real analysis' }
+        ]
+      }
+    };
+
+    const el = {
+      logo: document.getElementById('case-logo'),
+      client: document.getElementById('case-client'),
+      tag: document.getElementById('case-tag'),
+      challenge: document.getElementById('case-challenge'),
+      approach: document.getElementById('case-approach'),
+      outcome: document.getElementById('case-outcome'),
+      num: [document.getElementById('case-num-1'), document.getElementById('case-num-2'), document.getElementById('case-num-3')],
+      text: [document.getElementById('case-text-1'), document.getElementById('case-text-2'), document.getElementById('case-text-3')]
+    };
+
+    function apply(key) {
+      const d = data[key];
+      if (!d) return;
+      const morphing = document.querySelectorAll('.case-morphing');
+      morphing.forEach(m => m.classList.add('morphing'));
+      setTimeout(() => {
+        el.logo.textContent = d.logo;
+        el.client.textContent = d.client;
+        el.tag.textContent = d.tag;
+        el.challenge.textContent = d.challenge;
+        el.approach.textContent = d.approach;
+        el.outcome.textContent = d.outcome;
+        d.m.forEach((m, i) => {
+          const n = el.num[i], t = el.text[i];
+          if (!n || !t) return;
+          n.dataset.target = m.n;
+          n.dataset.suffix = m.s;
+          n.dataset.prefix = m.p;
+          t.textContent = m.t;
+          // Animate the number
+          const startVal = 0;
+          const duration = 800;
+          const startTime = performance.now();
+          function step(now) {
+            const p = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - p, 3);
+            n.textContent = (m.p || '') + Math.round(eased * m.n) + (m.s || '');
+            if (p < 1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        });
+        morphing.forEach(m => m.classList.remove('morphing'));
+      }, 220);
+    }
+
+    select.addEventListener('change', () => apply(select.value));
+  })();
+
+  /* Shared: minimal, safe markdown → HTML (bold + bullet lists only) */
+  function miniMarkdown(src) {
+    const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const lines = src.split('\n');
+    let html = '';
+    let inList = false;
+    for (let raw of lines) {
+      const line = raw.replace(/\s+$/, '');
+      if (/^\s*[-*]\s+/.test(line)) {
+        if (!inList) { html += '<ul style="margin:0.3rem 0 0.8rem 1.1rem;">'; inList = true; }
+        let item = esc(line.replace(/^\s*[-*]\s+/, ''));
+        item = item.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        html += `<li style="margin:0.15rem 0;">${item}</li>`;
+      } else {
+        if (inList) { html += '</ul>'; inList = false; }
+        if (line.trim() === '') { html += '<div style="height:0.5rem;"></div>'; continue; }
+        let p = esc(line).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        html += `<div>${p}</div>`;
+      }
+    }
+    if (inList) html += '</ul>';
+    return html;
+  }
+
+  /* Shared: stream from the Claude proxy, calling onToken for each chunk */
+  async function streamClaude(mode, payload, onToken, onDone, onError) {
+    const base = window.AXON_API_BASE || '';
+    let res;
+    try {
+      res = await fetch(`${base}/api/claude?mode=${mode}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      onError('Our assistant is warming up — try again or book a call directly.');
+      return;
+    }
+    if (!res.ok || !res.body) {
+      onError('Our assistant is warming up — try again or book a call directly.');
+      return;
+    }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let errored = false;
+    while (true) {
+      let chunk;
+      try { chunk = await reader.read(); } catch { onError('Stream interrupted — please retry.'); return; }
+      if (chunk.done) break;
+      buffer += decoder.decode(chunk.value, { stream: true });
+      const events = buffer.split('\n\n');
+      buffer = events.pop() || '';
+      for (const evt of events) {
+        const isError = evt.includes('event: error');
+        const dataLine = evt.split('\n').find((l) => l.startsWith('data:'));
+        if (!dataLine) continue;
+        try {
+          const parsed = JSON.parse(dataLine.slice(5).trim());
+          if (isError) { errored = true; onError(parsed.message || 'Something went wrong.'); return; }
+          if (parsed.text) onToken(parsed.text);
+          if (parsed.done) { onDone(); return; }
+        } catch { /* skip */ }
+      }
+    }
+    if (!errored) onDone();
+  }
+
+  /* Hero scope generator */
+  (function initScopeGen() {
+    const form = document.getElementById('scope-form');
+    const input = document.getElementById('scope-input');
+    const submit = document.getElementById('scope-submit');
+    const output = document.getElementById('scope-output');
+    const bodyEl = document.getElementById('scope-body');
+    const ctaEl = document.getElementById('scope-cta');
+    const hint = document.getElementById('scope-hint');
+    if (!form) return;
+
+    // auto-grow textarea
+    input.addEventListener('input', () => {
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 96) + 'px';
+    });
+
+    // sample chips
+    hint.querySelectorAll('b[data-sample]').forEach((b) => {
+      b.addEventListener('click', () => { input.value = b.dataset.sample; input.focus(); });
+    });
+
+    let busy = false;
+    let lastCall = 0;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const workflow = input.value.trim();
+      if (!workflow || busy) return;
+      const now = Date.now();
+      if (now - lastCall < 800) return;
+      lastCall = now;
+
+      busy = true;
+      submit.disabled = true;
+      submit.textContent = 'Drafting…';
+      output.classList.add('show');
+      ctaEl.classList.remove('show');
+      bodyEl.innerHTML = '<span class="scope-stream-cursor"></span>';
+
+      let acc = '';
+      await streamClaude('scope', { workflow },
+        (t) => { acc += t; bodyEl.innerHTML = miniMarkdown(acc) + '<span class="scope-stream-cursor"></span>'; output.scrollIntoView({ block: 'nearest' }); },
+        () => { bodyEl.innerHTML = miniMarkdown(acc); ctaEl.classList.add('show'); reset(); },
+        (msg) => { bodyEl.innerHTML = `<div style="color:var(--text-dim)">${msg}</div>`; ctaEl.classList.add('show'); reset(); }
+      );
+
+      function reset() {
+        busy = false;
+        submit.disabled = false;
+        submit.innerHTML = 'Generate scope <span class="arrow">→</span>';
+      }
+    });
+  })();
+
+  /* Ask Axon chat widget */
+  (function initAskAxon() {
+    const launcher = document.getElementById('ask-launcher');
+    const dialog = document.getElementById('ask-dialog');
+    const closeBtn = document.getElementById('ask-close');
+    const bodyEl = document.getElementById('ask-body');
+    const form = document.getElementById('ask-form');
+    const input = document.getElementById('ask-input');
+    const send = document.getElementById('ask-send');
+    const starters = document.getElementById('ask-starters');
+    if (!launcher || !dialog) return;
+
+    const STORE_KEY = 'axon-chat';
+    let history = [];
+    try { history = JSON.parse(sessionStorage.getItem(STORE_KEY) || '[]'); } catch { history = []; }
+
+    const GREETING = "Hi — I'm Axon's assistant. Ask me about how we scope, build and ship AI systems, what an engagement costs, or how we handle security. What's on your mind?";
+
+    function save() {
+      try { sessionStorage.setItem(STORE_KEY, JSON.stringify(history.slice(-16))); } catch {}
+    }
+
+    function renderMsg(role, text, stream) {
+      const wrap = document.createElement('div');
+      wrap.className = 'ask-msg ' + (role === 'user' ? 'user' : 'bot');
+      const t = document.createElement('div');
+      t.className = 'ask-msg-text';
+      if (role === 'bot') t.innerHTML = stream ? '<span class="ask-stream-cursor"></span>' : miniInline(text);
+      else t.textContent = text;
+      wrap.appendChild(t);
+      bodyEl.appendChild(wrap);
+      bodyEl.scrollTop = bodyEl.scrollHeight;
+      return t;
+    }
+
+    // inline markdown (bold + links) for chat — links auto-detected
+    function miniInline(src) {
+      let s = src.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      s = s.replace(/(https?:\/\/[^\s)]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+      return s.replace(/\n/g, '<br>');
+    }
+
+    function paint() {
+      bodyEl.innerHTML = '';
+      if (history.length === 0) { renderMsg('bot', GREETING, false); }
+      else history.forEach((m) => renderMsg(m.role, m.content, false));
+    }
+
+    let opened = false;
+    function open() {
+      if (!dialog.open) { try { dialog.show(); } catch { dialog.setAttribute('open', ''); } }
+      launcher.classList.add('hidden');
+      if (!opened) { paint(); opened = true; }
+      setTimeout(() => input.focus(), 100);
+    }
+    function close() {
+      if (dialog.open) { try { dialog.close(); } catch { dialog.removeAttribute('open'); } }
+      launcher.classList.remove('hidden');
+    }
+    launcher.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    dialog.addEventListener('cancel', (e) => { e.preventDefault(); close(); });
+
+    input.addEventListener('input', () => {
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 80) + 'px';
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); }
+    });
+
+    let busy = false;
+    let lastCall = 0;
+    async function ask(text) {
+      if (busy) return;
+      const now = Date.now();
+      if (now - lastCall < 800) return;
+      lastCall = now;
+
+      history.push({ role: 'user', content: text });
+      renderMsg('user', text, false);
+      save();
+      starters.style.display = 'none';
+
+      busy = true; send.disabled = true;
+      const botEl = renderMsg('bot', '', true);
+      let acc = '';
+
+      await streamClaude('chat', { messages: history },
+        (tk) => { acc += tk; botEl.innerHTML = miniInline(acc) + '<span class="ask-stream-cursor"></span>'; bodyEl.scrollTop = bodyEl.scrollHeight; },
+        () => {
+          botEl.innerHTML = miniInline(acc || "I didn't catch that — mind rephrasing?");
+          history.push({ role: 'assistant', content: acc });
+          save();
+          done();
+        },
+        (msg) => { botEl.innerHTML = miniInline(msg); done(); }
+      );
+
+      function done() { busy = false; send.disabled = false; bodyEl.scrollTop = bodyEl.scrollHeight; }
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = ''; input.style.height = 'auto';
+      ask(text);
+    });
+
+    starters.querySelectorAll('.ask-starter').forEach((b) => {
+      b.addEventListener('click', () => ask(b.dataset.q));
+    });
+  })();
 </script>
 
 </body>
