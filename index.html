@@ -138,24 +138,189 @@
     position: fixed;
     inset: 0;
     z-index: -1;
-    background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, var(--glow-1), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 90% 110%, var(--glow-2), transparent 60%),
-      radial-gradient(ellipse 40% 30% at 10% 80%, var(--glow-3), transparent 60%),
-      var(--bg);
-    transition: background 0.3s ease;
+    background: var(--bg);
+    overflow: hidden;
+    transition: background 0.5s ease;
+    isolation: isolate;
   }
 
-  .grid-bg::before {
-    content: '';
+  /* Aurora mesh — drifting colour blobs */
+  .aurora {
+    position: absolute;
+    inset: -20%;
+    z-index: 0;
+    filter: blur(80px) saturate(1.15);
+    opacity: 0.7;
+    transition: opacity 0.4s ease, filter 0.4s ease;
+  }
+  [data-theme="light"] .aurora,
+  :root:not([data-theme="dark"]) .aurora { opacity: 0.55; filter: blur(90px) saturate(1.05); }
+
+  .aurora-blob {
+    position: absolute;
+    width: 55vw;
+    height: 55vw;
+    max-width: 900px;
+    max-height: 900px;
+    border-radius: 50%;
+    mix-blend-mode: screen;
+    will-change: transform;
+  }
+  [data-theme="light"] .aurora-blob,
+  :root:not([data-theme="dark"]) .aurora-blob { mix-blend-mode: multiply; opacity: 0.55; }
+
+  .aurora-blob--1 { background: radial-gradient(circle, var(--accent) 0%, transparent 65%); top: -10vw; left: -12vw; animation: aurora-drift-1 46s ease-in-out infinite; }
+  .aurora-blob--2 { background: radial-gradient(circle, var(--accent-2) 0%, transparent 65%); top: 5vw;  right: -18vw; animation: aurora-drift-2 58s ease-in-out infinite; }
+  .aurora-blob--3 { background: radial-gradient(circle, var(--accent-3) 0%, transparent 65%); bottom: -20vw; left: 18vw; animation: aurora-drift-3 52s ease-in-out infinite; }
+  .aurora-blob--4 { background: radial-gradient(circle, var(--accent) 0%, transparent 65%); bottom: -8vw; right: -8vw; animation: aurora-drift-4 64s ease-in-out infinite; opacity: 0.8; }
+
+  @keyframes aurora-drift-1 {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    33% { transform: translate3d(14vw, 9vw, 0) scale(1.1); }
+    66% { transform: translate3d(-8vw, 18vw, 0) scale(0.95); }
+  }
+  @keyframes aurora-drift-2 {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    40% { transform: translate3d(-18vw, 14vw, 0) scale(1.12); }
+    75% { transform: translate3d(-10vw, -4vw, 0) scale(0.92); }
+  }
+  @keyframes aurora-drift-3 {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(22vw, -14vw, 0) scale(1.18); }
+  }
+  @keyframes aurora-drift-4 {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+    35% { transform: translate3d(-14vw, -8vw, 0) scale(1); }
+    70% { transform: translate3d(9vw, 5vw, 0) scale(1.12); }
+  }
+
+  /* Cursor spotlight */
+  .cursor-spot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--glow-1) 0%, transparent 65%);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(-50%, -50%, 0);
+    transition: opacity 0.4s ease;
+    z-index: 1;
+    mix-blend-mode: screen;
+    will-change: transform;
+  }
+  [data-theme="light"] .cursor-spot,
+  :root:not([data-theme="dark"]) .cursor-spot { mix-blend-mode: multiply; }
+  .cursor-spot.active { opacity: 0.7; }
+  @media (hover: none), (pointer: coarse) {
+    .cursor-spot { display: none; }
+  }
+
+  /* Grid overlay */
+  .grid-overlay {
     position: absolute;
     inset: 0;
+    z-index: 2;
+    pointer-events: none;
     background-image:
       linear-gradient(var(--grid-line) 1px, transparent 1px),
       linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size: 56px 56px;
     mask-image: radial-gradient(ellipse 100% 70% at 50% 30%, black 40%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 30%, black 40%, transparent 80%);
   }
+
+  /* Grain texture */
+  .grain {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0.06;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    mix-blend-mode: overlay;
+  }
+  [data-theme="light"] .grain,
+  :root:not([data-theme="dark"]) .grain { opacity: 0.045; mix-blend-mode: multiply; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aurora-blob { animation: none; }
+    .cursor-spot { display: none; }
+  }
+
+  /* Glassmorphism refresh — cards become frosted glass floating over the aurora */
+  @supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+    .pillar,
+    .testimonial,
+    .case-card,
+    .team-card,
+    .milestones,
+    .approach-visual,
+    .cta,
+    .pill,
+    .trust-chip,
+    .outcome,
+    .btn-ghost,
+    .theme-toggle,
+    .pillar-deliverables-list span {
+      background: color-mix(in srgb, var(--surface) 68%, transparent);
+      backdrop-filter: blur(14px) saturate(1.4);
+      -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    }
+    .stat, .platform {
+      background: color-mix(in srgb, var(--surface) 68%, transparent);
+      backdrop-filter: blur(14px) saturate(1.4);
+      -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    }
+    [data-theme="light"] .pillar,
+    [data-theme="light"] .testimonial,
+    [data-theme="light"] .case-card,
+    [data-theme="light"] .team-card,
+    [data-theme="light"] .milestones,
+    [data-theme="light"] .approach-visual,
+    [data-theme="light"] .cta,
+    [data-theme="light"] .pill,
+    [data-theme="light"] .trust-chip,
+    [data-theme="light"] .outcome,
+    [data-theme="light"] .btn-ghost,
+    [data-theme="light"] .theme-toggle,
+    [data-theme="light"] .pillar-deliverables-list span,
+    [data-theme="light"] .stat,
+    [data-theme="light"] .platform,
+    :root:not([data-theme="dark"]) .pillar,
+    :root:not([data-theme="dark"]) .testimonial,
+    :root:not([data-theme="dark"]) .case-card,
+    :root:not([data-theme="dark"]) .team-card,
+    :root:not([data-theme="dark"]) .milestones,
+    :root:not([data-theme="dark"]) .approach-visual,
+    :root:not([data-theme="dark"]) .cta,
+    :root:not([data-theme="dark"]) .pill,
+    :root:not([data-theme="dark"]) .trust-chip,
+    :root:not([data-theme="dark"]) .outcome,
+    :root:not([data-theme="dark"]) .btn-ghost,
+    :root:not([data-theme="dark"]) .theme-toggle,
+    :root:not([data-theme="dark"]) .pillar-deliverables-list span,
+    :root:not([data-theme="dark"]) .stat,
+    :root:not([data-theme="dark"]) .platform {
+      background: color-mix(in srgb, var(--surface) 80%, transparent);
+    }
+    nav {
+      background: color-mix(in srgb, var(--bg) 60%, transparent);
+      backdrop-filter: blur(20px) saturate(1.3);
+      -webkit-backdrop-filter: blur(20px) saturate(1.3);
+    }
+  }
+
+  /* Section hue scoping — different accent tint per section, gradient stays constant */
+  :root { transition: none; }
+  html.hue-purple { --accent: #a78bfa; --accent-2: #c4b0ff; --glow-1: rgba(167,139,250,0.22); }
+  html.hue-teal   { --accent: #5eead4; --accent-2: #7dd3fc; --glow-1: rgba(94,234,212,0.22); }
+  html.hue-amber  { --accent: #fbbf24; --accent-2: #fb923c; --glow-1: rgba(251,191,36,0.18); }
+  html[data-theme="light"].hue-purple, html:not([data-theme="dark"]).hue-purple { --accent: #6d28d9; --accent-2: #7c3aed; --glow-1: rgba(109,40,217,0.10); }
+  html[data-theme="light"].hue-teal,   html:not([data-theme="dark"]).hue-teal   { --accent: #0f766e; --accent-2: #0891b2; --glow-1: rgba(15,118,110,0.09); }
+  html[data-theme="light"].hue-amber,  html:not([data-theme="dark"]).hue-amber  { --accent: #b45309; --accent-2: #c2410c; --glow-1: rgba(180,83,9,0.08); }
 
   .container {
     max-width: 1200px;
@@ -1340,7 +1505,17 @@
 </head>
 <body>
 
-<div class="grid-bg"></div>
+<div class="grid-bg" aria-hidden="true">
+  <div class="aurora">
+    <div class="aurora-blob aurora-blob--1"></div>
+    <div class="aurora-blob aurora-blob--2"></div>
+    <div class="aurora-blob aurora-blob--3"></div>
+    <div class="aurora-blob aurora-blob--4"></div>
+  </div>
+  <div class="cursor-spot" id="cursor-spot"></div>
+  <div class="grid-overlay"></div>
+  <div class="grain"></div>
+</div>
 
 <nav id="site-nav">
   <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
@@ -1381,14 +1556,14 @@
   </div>
 </nav>
 
-<div class="pre-hero">
+<div class="pre-hero" data-hue="purple">
   <div class="container">
     <p class="reveal">You don't need another AI demo.</p>
     <p class="reveal">You need a delivery partner who'll sit with your team until it's shipped, owned, and still running in 90 days.</p>
   </div>
 </div>
 
-<header class="hero">
+<header class="hero" data-hue="purple">
   <div class="container">
     <div class="pill reveal">
       <span class="pill-dot"></span>
@@ -1403,7 +1578,7 @@
   </div>
 </header>
 
-<section class="trust-strip reveal" aria-label="Trusted by">
+<section class="trust-strip reveal" aria-label="Trusted by" data-hue="purple">
   <div class="container">
     <p class="trust-label">Trusted by teams at</p>
     <div class="trust-chips">
@@ -1418,7 +1593,7 @@
   </div>
 </section>
 
-<section id="platforms" class="logos" style="padding-top: 3rem;">
+<section id="platforms" class="logos" data-hue="teal" style="padding-top: 3rem;">
   <div class="container">
     <p class="logos-label reveal">We build on the tools your team already loves</p>
     <div class="platforms">
@@ -1439,7 +1614,7 @@
   </div>
 </section>
 
-<section id="services">
+<section id="services" data-hue="teal">
   <div class="container">
     <div class="section-header reveal">
       <span class="eyebrow">Services</span>
@@ -1524,7 +1699,7 @@
   </div>
 </section>
 
-<section id="approach">
+<section id="approach" data-hue="teal">
   <div class="container two-col">
     <div class="approach-visual from-left">
       <div class="terminal-bar"><span></span><span></span><span></span></div>
@@ -1558,7 +1733,7 @@
 
 <div class="section-ornament reveal" aria-hidden="true">✦ ✦ ✦</div>
 
-<section id="team">
+<section id="team" data-hue="amber">
   <div class="container">
     <div class="section-header reveal">
       <span class="eyebrow">Who you work with</span>
@@ -1582,7 +1757,7 @@
   </div>
 </section>
 
-<section>
+<section data-hue="amber">
   <div class="container">
     <div class="section-header reveal">
       <span class="eyebrow">Timeline</span>
@@ -1618,7 +1793,7 @@
   </div>
 </section>
 
-<section id="work">
+<section id="work" data-hue="amber">
   <div class="container">
     <div class="section-header reveal">
       <span class="eyebrow">Selected work</span>
@@ -1705,7 +1880,7 @@
   </div>
 </section>
 
-<section aria-label="Founder quote" style="padding-top: clamp(2rem, 4vw, 3rem); padding-bottom: clamp(2rem, 4vw, 3rem);">
+<section aria-label="Founder quote" data-hue="amber" style="padding-top: clamp(2rem, 4vw, 3rem); padding-bottom: clamp(2rem, 4vw, 3rem);">
   <div class="container">
     <div class="pull-quote reveal">
       <blockquote>Most agencies hand you a tool. We hand you a system your team already owns, runs, and improves on without us.</blockquote>
@@ -1717,7 +1892,7 @@
   </div>
 </section>
 
-<section id="faq">
+<section id="faq" data-hue="purple">
   <div class="container">
     <div class="section-header reveal">
       <span class="eyebrow">FAQ</span>
@@ -1771,7 +1946,7 @@
   </div>
 </section>
 
-<section id="contact">
+<section id="contact" data-hue="purple">
   <div class="container">
     <div class="cta reveal">
       <span class="eyebrow">Get started</span>
@@ -1887,6 +2062,55 @@
   }, { threshold: 0.35 });
 
   document.querySelectorAll('.case-outcomes').forEach(el => counterObserver.observe(el));
+
+  /* Cursor-following spotlight */
+  const cursorSpot = document.getElementById('cursor-spot');
+  const prefersFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (cursorSpot && prefersFinePointer && !reduceMotion) {
+    let raf = null;
+    let targetX = window.innerWidth / 2;
+    let targetY = window.innerHeight / 2;
+    let currentX = targetX;
+    let currentY = targetY;
+    let firstMove = true;
+    function loop() {
+      currentX += (targetX - currentX) * 0.15;
+      currentY += (targetY - currentY) * 0.15;
+      cursorSpot.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
+      raf = requestAnimationFrame(loop);
+    }
+    window.addEventListener('mousemove', (e) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
+      if (firstMove) {
+        currentX = targetX;
+        currentY = targetY;
+        cursorSpot.classList.add('active');
+        firstMove = false;
+        if (!raf) raf = requestAnimationFrame(loop);
+      }
+    }, { passive: true });
+    window.addEventListener('mouseleave', () => cursorSpot.classList.remove('active'));
+    window.addEventListener('mouseenter', () => cursorSpot.classList.add('active'));
+  }
+
+  /* Section-scoped hue transitions */
+  const rootEl = document.documentElement;
+  const hueSections = document.querySelectorAll('[data-hue]');
+  const hueClasses = ['hue-purple', 'hue-teal', 'hue-amber'];
+  function setHue(hue) {
+    hueClasses.forEach(c => rootEl.classList.toggle(c, c === 'hue-' + hue));
+  }
+  const hueObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && e.intersectionRatio > 0.3) {
+        setHue(e.target.dataset.hue);
+      }
+    });
+  }, { threshold: [0.3, 0.6], rootMargin: '-20% 0px -40% 0px' });
+  hueSections.forEach(s => hueObserver.observe(s));
+  setHue('purple');
 </script>
 
 </body>
