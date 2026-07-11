@@ -2091,7 +2091,7 @@
   .pillar-illustration circle[fill="currentColor"] { fill: currentColor; stroke: none; }
   /* Idle motion */
   @keyframes pillar-glow-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 0.9; } }
-  .pillar.in .pillar-illustration { animation: pillar-glow-pulse 4.5s ease-in-out infinite; }
+  .pillar.in .pillar-illustration { animation: pillar-glow-pulse 4.5s ease-in-out infinite; will-change: opacity; transform: translateZ(0); }
   @media (prefers-reduced-motion: reduce) {
     .pillar-illustration circle,
     .pillar-illustration rect,
@@ -2739,24 +2739,29 @@
 
   const nav = document.getElementById('site-nav');
   const progressBar = document.getElementById('scroll-progress');
-  window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 40);
-    if (progressBar) {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      const ratio = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
-      progressBar.style.width = (ratio * 100) + '%';
-    }
-  }, { passive: true });
-
   const headline = document.getElementById('hero-headline');
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!prefersReducedMotion) {
-    window.addEventListener('scroll', () => {
-      if (window.scrollY < window.innerHeight) {
-        headline.style.transform = `translateY(${window.scrollY * 0.12}px)`;
-      }
-    }, { passive: true });
+
+  // Single rAF-throttled scroll handler. The listener only sets a flag; all
+  // DOM reads/writes happen once per frame inside onScrollFrame, so fast
+  // scroll events never queue up layout work on the main thread.
+  let scrollTicking = false;
+  function onScrollFrame() {
+    const y = window.scrollY;
+    nav.classList.toggle('scrolled', y > 40);
+    if (progressBar) {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const ratio = max > 0 ? Math.min(y / max, 1) : 0;
+      progressBar.style.width = (ratio * 100) + '%';
+    }
+    if (!prefersReducedMotion && headline && y < window.innerHeight) {
+      headline.style.transform = `translateY(${y * 0.12}px)`;
+    }
+    scrollTicking = false;
   }
+  window.addEventListener('scroll', () => {
+    if (!scrollTicking) { scrollTicking = true; requestAnimationFrame(onScrollFrame); }
+  }, { passive: true });
 
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(e => {
@@ -2812,11 +2817,20 @@
     let currentX = targetX;
     let currentY = targetY;
     let firstMove = true;
+    // Settle threshold: once the spotlight is within 0.5px of the cursor we
+    // stop the rAF loop entirely so no compositing work happens while the
+    // pointer is idle (this is what was inflating INP during clicks/typing).
     function loop() {
-      currentX += (targetX - currentX) * 0.15;
-      currentY += (targetY - currentY) * 0.15;
+      const dx = targetX - currentX;
+      const dy = targetY - currentY;
+      currentX += dx * 0.15;
+      currentY += dy * 0.15;
       cursorSpot.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
-      raf = requestAnimationFrame(loop);
+      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+        raf = requestAnimationFrame(loop);
+      } else {
+        raf = null; // reached target — idle, no further paints
+      }
     }
     window.addEventListener('mousemove', (e) => {
       targetX = e.clientX;
@@ -2826,8 +2840,8 @@
         currentY = targetY;
         cursorSpot.classList.add('active');
         firstMove = false;
-        if (!raf) raf = requestAnimationFrame(loop);
       }
+      if (!raf) raf = requestAnimationFrame(loop); // wake the loop only while moving
     }, { passive: true });
     window.addEventListener('mouseleave', () => cursorSpot.classList.remove('active'));
     window.addEventListener('mouseenter', () => cursorSpot.classList.add('active'));
@@ -3268,10 +3282,16 @@
     const hint = document.getElementById('scope-hint');
     if (!form) return;
 
-    // auto-grow textarea
+    // auto-grow textarea — deferred to rAF so the keystroke paints first
+    let growQueued = false;
     input.addEventListener('input', () => {
-      input.style.height = 'auto';
-      input.style.height = Math.min(input.scrollHeight, 96) + 'px';
+      if (growQueued) return;
+      growQueued = true;
+      requestAnimationFrame(() => {
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 96) + 'px';
+        growQueued = false;
+      });
     });
 
     // sample chips
@@ -3375,9 +3395,15 @@
     closeBtn.addEventListener('click', close);
     dialog.addEventListener('cancel', (e) => { e.preventDefault(); close(); });
 
+    let growQueued = false;
     input.addEventListener('input', () => {
-      input.style.height = 'auto';
-      input.style.height = Math.min(input.scrollHeight, 80) + 'px';
+      if (growQueued) return;
+      growQueued = true;
+      requestAnimationFrame(() => {
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 80) + 'px';
+        growQueued = false;
+      });
     });
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); }
