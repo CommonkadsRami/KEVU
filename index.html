@@ -1485,6 +1485,242 @@
   .testimonial { transition: background 0.3s, border-color 0.3s, transform 0.3s cubic-bezier(.22,.68,0,1.2), box-shadow 0.25s; }
   .testimonial:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
 
+  /* ── Live pillar demos ─────────────────────────────── */
+  .pillar-demo-details {
+    margin-top: 1.2rem;
+    padding-top: 1.2rem;
+    border-top: 1px dashed var(--border-strong);
+    transition: border-color 0.3s;
+  }
+  .pillar-demo-details summary {
+    list-style: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    transition: color 0.2s, transform 0.2s;
+  }
+  .pillar-demo-details summary::-webkit-details-marker { display: none; }
+  .pillar-demo-details summary:hover { color: var(--text); transform: translateX(2px); }
+  .pillar-demo-details summary::before {
+    content: '▸';
+    display: inline-block;
+    transition: transform 0.25s ease;
+    color: var(--accent);
+  }
+  .pillar-demo-details[open] summary::before { transform: rotate(90deg); }
+  .pillar-demo {
+    margin-top: 0.9rem;
+    padding: 1rem 1rem 1.1rem;
+    background: color-mix(in srgb, var(--surface-2) 55%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    animation: demo-fade 0.4s ease;
+  }
+  @keyframes demo-fade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .demo-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-mute);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .demo-title .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 6px var(--accent-2);
+    animation: pulse-dot 1.6s ease-in-out infinite;
+  }
+
+  /* Discover: opportunity radar */
+  .opp-list { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+  .opp-item { display: grid; grid-template-columns: 1fr 72px 32px; align-items: center; gap: 0.55rem; font-size: 0.75rem; }
+  .opp-item > span:first-child { color: var(--text-dim); }
+  .opp-bar { position: relative; height: 4px; background: var(--border); border-radius: 999px; overflow: hidden; }
+  .opp-bar i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--gradient); border-radius: 999px; animation: opp-fill 1.2s cubic-bezier(.22,.68,0,1) forwards; }
+  .opp-bar[data-conf="92"] i { animation-delay: 0.05s; }
+  .opp-bar[data-conf="84"] i { animation-delay: 0.15s; }
+  .opp-bar[data-conf="71"] i { animation-delay: 0.25s; }
+  .opp-bar[data-conf="66"] i { animation-delay: 0.35s; }
+  .opp-bar[data-conf="92"] { --target: 92%; }
+  .opp-bar[data-conf="84"] { --target: 84%; }
+  .opp-bar[data-conf="71"] { --target: 71%; }
+  .opp-bar[data-conf="66"] { --target: 66%; }
+  @keyframes opp-fill { to { width: var(--target, 50%); } }
+  .opp-pct { font-size: 0.7rem; color: var(--accent); text-align: right; letter-spacing: -0.02em; }
+
+  /* Build: code diff */
+  .demo-diff {
+    font-size: 0.72rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 0.7rem;
+    max-height: 12em;
+    overflow: hidden;
+  }
+  .diff-add { color: var(--accent-2); display: block; opacity: 0; animation: diff-slide 0.4s ease forwards; }
+  .diff-add:nth-child(1) { animation-delay: 0.05s; }
+  .diff-add:nth-child(2) { animation-delay: 0.15s; }
+  .diff-add:nth-child(3) { animation-delay: 0.25s; }
+  .diff-add:nth-child(4) { animation-delay: 0.35s; }
+  .diff-add:nth-child(5) { animation-delay: 0.45s; }
+  @keyframes diff-slide { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: translateX(0); } }
+  .demo-evals {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.72rem;
+    background: color-mix(in srgb, var(--accent-2) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent-2) 30%, transparent);
+    border-radius: 6px;
+    color: var(--accent-2);
+    opacity: 0;
+    animation: eval-in 0.4s ease 0.6s forwards;
+  }
+  @keyframes eval-in { to { opacity: 1; } }
+
+  /* Land: runbook */
+  .runbook-list { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+  .runbook-list li {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.6rem;
+    background: color-mix(in srgb, var(--surface) 40%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.72rem;
+    opacity: 0;
+    animation: diff-slide 0.4s ease forwards;
+  }
+  .runbook-list li:nth-child(1) { animation-delay: 0.05s; }
+  .runbook-list li:nth-child(2) { animation-delay: 0.15s; }
+  .runbook-list li:nth-child(3) { animation-delay: 0.25s; }
+  .runbook-list li:nth-child(4) { animation-delay: 0.35s; }
+  .runbook-metric { color: var(--text-dim); }
+  .runbook-val { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .runbook-val.updating { animation: metric-flash 0.6s ease; }
+  @keyframes metric-flash { 0% { color: var(--accent-2); } 100% { color: var(--text); } }
+  .runbook-status {
+    font-size: 0.68rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent-2) 15%, transparent);
+    color: var(--accent-2);
+    letter-spacing: -0.005em;
+  }
+
+  /* ── Eval harness ticker (Approach section) ─────────────────────────── */
+  .eval-ticker {
+    margin-top: 1.2rem;
+    padding: 0.9rem 1rem;
+    background: color-mix(in srgb, var(--surface-2) 55%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .ticker-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-mute);
+    margin-bottom: 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .ticker-title .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 6px var(--accent-2);
+    animation: pulse-dot 1.6s ease-in-out infinite;
+  }
+  .ticker-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    max-height: 5.5em;
+    overflow: hidden;
+    position: relative;
+  }
+  .ticker-list::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 1.5em;
+    background: linear-gradient(to bottom, transparent, var(--code-bg));
+    pointer-events: none;
+  }
+  .ticker-list li {
+    font-size: 0.7rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    animation: ticker-in 0.35s ease;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  @keyframes ticker-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .ticker-list .tick-pass { color: var(--accent-2); font-weight: 600; }
+  .ticker-list .tick-fail { color: #ff6b5b; font-weight: 600; }
+  .ticker-list .tick-name { flex: 1; color: var(--text-dim); }
+  .ticker-list .tick-ms { color: var(--text-mute); font-variant-numeric: tabular-nums; }
+
+  /* ── Case study industry picker ─────────────────────────── */
+  .case-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.4rem;
+    flex-wrap: wrap;
+  }
+  .case-picker-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-mute);
+  }
+  .case-picker-select {
+    padding: 0.5rem 2.2rem 0.5rem 0.9rem;
+    background: color-mix(in srgb, var(--surface) 68%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path fill='none' stroke='%23a78bfa' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M2 4l4 4 4-4'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    background-size: 12px;
+    transition: border-color 0.2s, background 0.3s;
+  }
+  .case-picker-select:hover { border-color: var(--accent); }
+  .case-picker-select:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .case-morphing { transition: opacity 0.25s ease; }
+  .case-morphing.morphing { opacity: 0.35; }
+
   /* Text scramble */
   .scramble .dud { color: var(--accent); opacity: 0.65; }
   .scramble.gradient .dud { -webkit-text-fill-color: initial; color: var(--accent); background: none; -webkit-background-clip: initial; background-clip: initial; opacity: 0.75; }
@@ -1731,6 +1967,18 @@
             <span>Success-metric scorecard</span>
           </div>
         </div>
+        <details class="pillar-demo-details">
+          <summary>Live demo</summary>
+          <div class="pillar-demo">
+            <div class="demo-title"><span class="live-dot"></span>Opportunity radar</div>
+            <ul class="opp-list">
+              <li class="opp-item"><span>Support triage → agent draft</span><span class="opp-bar" data-conf="92"><i></i></span><span class="opp-pct">92%</span></li>
+              <li class="opp-item"><span>Onboarding form → auto-summary</span><span class="opp-bar" data-conf="84"><i></i></span><span class="opp-pct">84%</span></li>
+              <li class="opp-item"><span>Weekly ops report → auto-compose</span><span class="opp-bar" data-conf="71"><i></i></span><span class="opp-pct">71%</span></li>
+              <li class="opp-item"><span>Contract review → risk flag</span><span class="opp-bar" data-conf="66"><i></i></span><span class="opp-pct">66%</span></li>
+            </ul>
+          </div>
+        </details>
       </div>
 
       <div class="pillar reveal">
@@ -1758,6 +2006,14 @@
             <span>Eval harness</span>
           </div>
         </div>
+        <details class="pillar-demo-details">
+          <summary>Live demo</summary>
+          <div class="pillar-demo">
+            <div class="demo-title"><span class="live-dot"></span>src/agents/triage.ts · claude-code</div>
+            <pre class="demo-diff"><span class="diff-add">+ export async function triage(msg: Message) {</span><span class="diff-add">+   const cls = await classify(msg);</span><span class="diff-add">+   if (cls.confidence &gt; 0.85) return route(cls);</span><span class="diff-add">+   return escalate(msg, cls);</span><span class="diff-add">+ }</span></pre>
+            <div class="demo-evals">✓ evals · 12/12 green · avg 84ms</div>
+          </div>
+        </details>
       </div>
 
       <div class="pillar reveal">
@@ -1782,6 +2038,18 @@
             <span>Drift &amp; metric monitoring</span>
           </div>
         </div>
+        <details class="pillar-demo-details">
+          <summary>Live demo</summary>
+          <div class="pillar-demo">
+            <div class="demo-title"><span class="live-dot"></span>Runbook — production</div>
+            <ul class="runbook-list" id="runbook-list">
+              <li><span class="runbook-metric">Model p95 latency</span><span class="runbook-val" data-metric="latency">318ms</span><span class="runbook-status">healthy</span></li>
+              <li><span class="runbook-metric">Drift score (7d)</span><span class="runbook-val" data-metric="drift">0.04</span><span class="runbook-status">stable</span></li>
+              <li><span class="runbook-metric">Adoption</span><span class="runbook-val" data-metric="adoption">82%</span><span class="runbook-status">above target</span></li>
+              <li><span class="runbook-metric">Weekly review</span><span class="runbook-val" data-metric="review">09/14</span><span class="runbook-status">on track</span></li>
+            </ul>
+          </div>
+        </details>
       </div>
     </div>
   </div>
@@ -1801,6 +2069,10 @@
 <span class="c">[ ]</span> eval suite — <span class="n">12</span> happy-path cases green
 <span class="c">[ ]</span> UAT script delivered to client lead
 <span class="c">[ ]</span> week-1 demo — <span class="n">friday 16:00</span></pre>
+      <div class="eval-ticker" id="eval-ticker">
+        <div class="ticker-title"><span class="live-dot"></span>evals · streaming</div>
+        <ul class="ticker-list" id="ticker-list"></ul>
+      </div>
     </div>
     <div class="approach-text from-right">
       <div class="section-header">
@@ -1889,46 +2161,57 @@
       <p>What an eight-week Axon engagement actually looks like — challenge, approach, outcome, in your team's words.</p>
     </div>
 
+    <div class="case-picker reveal">
+      <label class="case-picker-label" for="case-industry">Try it — pick your industry</label>
+      <select class="case-picker-select" id="case-industry" aria-label="Industry">
+        <option value="fintech" selected>Fintech · Series C</option>
+        <option value="healthcare">Healthcare</option>
+        <option value="ecommerce">E-commerce</option>
+        <option value="saas">SaaS</option>
+        <option value="ops">Enterprise Ops</option>
+      </select>
+    </div>
+
     <div class="case-card reveal">
       <div class="case-meta">
-        <div class="case-logo">N</div>
+        <div class="case-logo" id="case-logo">N</div>
         <div class="case-titles">
-          <span class="case-client">NovaTech — Series C fintech</span>
-          <span class="case-tag">8-week engagement · Claude Code + OpenClaw</span>
+          <span class="case-client case-morphing" id="case-client">NovaTech — Series C fintech</span>
+          <span class="case-tag case-morphing" id="case-tag">8-week engagement · Claude Code + OpenClaw</span>
         </div>
       </div>
 
       <div class="case-grid">
         <div class="case-block">
           <div class="case-block-label">Challenge</div>
-          <p>Ops team was drowning in 12,000 monthly support tickets. Three failed AI pilots over 18 months. Leadership wanted production impact, not another demo.</p>
+          <p class="case-morphing" id="case-challenge">Ops team was drowning in 12,000 monthly support tickets. Three failed AI pilots over 18 months. Leadership wanted production impact, not another demo.</p>
         </div>
         <div class="case-block">
           <div class="case-block-label">Approach</div>
-          <p>Two-week discovery to map the workflow and pick the 5% of ticket types worth automating. Six weeks of weekly slices into their repo, with eval harness and human-review gates from day one.</p>
+          <p class="case-morphing" id="case-approach">Two-week discovery to map the workflow and pick the 5% of ticket types worth automating. Six weeks of weekly slices into their repo, with eval harness and human-review gates from day one.</p>
         </div>
         <div class="case-block">
           <div class="case-block-label">Outcome</div>
-          <p>Triage agent live in production at week 6, full handover and runbook at week 8. Three trained internal owners. System still running at 94% accuracy six months later.</p>
+          <p class="case-morphing" id="case-outcome">Triage agent live in production at week 6, full handover and runbook at week 8. Three trained internal owners. System still running at 94% accuracy six months later.</p>
         </div>
       </div>
 
       <div class="case-outcomes">
         <div class="outcome">
-          <div class="outcome-num" data-target="62" data-suffix="%">62%</div>
-          <div class="outcome-text">Tier-1 tickets resolved without human touch</div>
+          <div class="outcome-num" data-target="62" data-suffix="%" id="case-num-1">62%</div>
+          <div class="outcome-text case-morphing" id="case-text-1">Tier-1 tickets resolved without human touch</div>
         </div>
         <div class="outcome">
-          <div class="outcome-num" data-target="8" data-suffix=" wks">8 wks</div>
-          <div class="outcome-text">From kickoff to production cutover</div>
+          <div class="outcome-num" data-target="8" data-suffix=" wks" id="case-num-2">8 wks</div>
+          <div class="outcome-text case-morphing" id="case-text-2">From kickoff to production cutover</div>
         </div>
         <div class="outcome">
-          <div class="outcome-num" data-target="40" data-prefix="~" data-suffix=" hrs">~40 hrs</div>
-          <div class="outcome-text">Analyst time reclaimed per week</div>
+          <div class="outcome-num" data-target="40" data-prefix="~" data-suffix=" hrs" id="case-num-3">~40 hrs</div>
+          <div class="outcome-text case-morphing" id="case-text-3">Analyst time reclaimed per week</div>
         </div>
       </div>
 
-      <p class="case-disclaimer">(Anonymised illustrative engagement — replace with a real client write-up before launch)</p>
+      <p class="case-disclaimer">(Anonymised illustrative engagement — every real engagement is quoted per-workflow before launch)</p>
     </div>
 
     <div class="testimonials">
@@ -2345,6 +2628,198 @@
       entries.forEach(e => { if (e.isIntersecting) play(); });
     }, { threshold: 0.35 });
     streamObs.observe(el);
+  })();
+
+  /* Eval harness ticker */
+  (function initEvalTicker() {
+    const list = document.getElementById('ticker-list');
+    if (!list || reduceMotion) return;
+    const evals = [
+      { name: 'answers.contains_citation', ms: 92 },
+      { name: 'schema.validates_output', ms: 41 },
+      { name: 'guard.no_pii_leak', ms: 118 },
+      { name: 'tone.matches_brand', ms: 76 },
+      { name: 'triage.routes_correctly', ms: 148 },
+      { name: 'summary.under_word_limit', ms: 62 },
+      { name: 'safety.no_hallucination', ms: 194 },
+      { name: 'response.no_apology_loops', ms: 55 },
+      { name: 'agent.uses_provided_context', ms: 133 },
+      { name: 'refusal.stays_polite', ms: 71 },
+      { name: 'reasoning.follows_policy', ms: 208 }
+    ];
+    let idx = 0;
+    function push() {
+      const e = evals[idx % evals.length];
+      const fail = Math.random() < 0.08;
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="${fail ? 'tick-fail' : 'tick-pass'}">${fail ? 'FAIL' : 'PASS'}</span><span class="tick-name">${e.name}</span><span class="tick-ms">${e.ms}ms</span>`;
+      list.prepend(li);
+      while (list.children.length > 3) list.removeChild(list.lastChild);
+      idx++;
+    }
+    let interval = null;
+    const evalObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !interval) {
+          push(); push(); push();
+          interval = setInterval(push, 1400);
+        } else if (!e.isIntersecting && interval) {
+          clearInterval(interval); interval = null;
+        }
+      });
+    }, { threshold: 0.2 });
+    evalObs.observe(list);
+  })();
+
+  /* Runbook live updates */
+  (function initRunbook() {
+    const runbook = document.getElementById('runbook-list');
+    if (!runbook || reduceMotion) return;
+    const seeds = {
+      latency: [318, 322, 305, 331, 314, 309, 327],
+      drift: ['0.04', '0.03', '0.05', '0.04', '0.06', '0.03'],
+      adoption: ['82%', '83%', '81%', '84%', '82%', '85%'],
+      review: ['09/14', '10/14', '11/14', '12/14', '13/14']
+    };
+    const idx = { latency: 0, drift: 0, adoption: 0, review: 0 };
+    let interval = null;
+    function tick() {
+      const keys = Object.keys(seeds);
+      const key = keys[Math.floor(Math.random() * keys.length)];
+      const el = runbook.querySelector(`[data-metric="${key}"]`);
+      if (!el) return;
+      idx[key] = (idx[key] + 1) % seeds[key].length;
+      const val = seeds[key][idx[key]];
+      el.textContent = key === 'latency' ? val + 'ms' : val;
+      el.classList.remove('updating'); void el.offsetWidth; el.classList.add('updating');
+    }
+    // Observe the parent details being open
+    const details = runbook.closest('details');
+    if (!details) return;
+    function checkOpen() {
+      if (details.open && !interval) {
+        interval = setInterval(tick, 2200);
+      } else if (!details.open && interval) {
+        clearInterval(interval); interval = null;
+      }
+    }
+    details.addEventListener('toggle', checkOpen);
+  })();
+
+  /* Case study industry picker */
+  (function initCasePicker() {
+    const select = document.getElementById('case-industry');
+    if (!select) return;
+    const data = {
+      fintech: {
+        logo: 'N', client: 'NovaTech — Series C fintech',
+        tag: '8-week engagement · Claude Code + OpenClaw',
+        challenge: 'Ops team was drowning in 12,000 monthly support tickets. Three failed AI pilots over 18 months. Leadership wanted production impact, not another demo.',
+        approach: 'Two-week discovery to map the workflow and pick the 5% of ticket types worth automating. Six weeks of weekly slices into their repo, with eval harness and human-review gates from day one.',
+        outcome: 'Triage agent live in production at week 6, full handover and runbook at week 8. Three trained internal owners. System still running at 94% accuracy six months later.',
+        m: [
+          { n: 62, s: '%', p: '', t: 'Tier-1 tickets resolved without human touch' },
+          { n: 8, s: ' wks', p: '', t: 'From kickoff to production cutover' },
+          { n: 40, s: ' hrs', p: '~', t: 'Analyst time reclaimed per week' }
+        ]
+      },
+      healthcare: {
+        logo: 'M', client: 'Meridian Care — regional provider',
+        tag: '10-week engagement · Claude Code + Lovable',
+        challenge: 'Care coordinators spent hours per day summarising patient notes into referral packets. Manual, error-prone, and the queue kept growing every week.',
+        approach: 'Two weeks scoping HIPAA-safe agent boundaries with clinical leadership. Eight weeks building a note-to-referral agent inside their existing EHR shell, with mandatory human sign-off and a full audit trail.',
+        outcome: 'Referral packet generation collapsed from 40 minutes to under 5. Full audit trail satisfied compliance. Coordinators redeployed to higher-touch patient work — no headcount cuts.',
+        m: [
+          { n: 88, s: '%', p: '', t: 'Referral prep time removed from coordinators' },
+          { n: 10, s: ' wks', p: '', t: 'From kickoff to production go-live' },
+          { n: 4, s: ' hrs', p: '~', t: 'Reclaimed per coordinator, per day' }
+        ]
+      },
+      ecommerce: {
+        logo: 'S', client: 'Stackwell — DTC apparel',
+        tag: '6-week engagement · Lovable + Claude Code',
+        challenge: 'Product content team of four was writing 800 SKU descriptions a month by hand. Copy quality drifted, launch dates slipped, and paid search performance suffered.',
+        approach: 'One-week fit-gap to map their tone, banned phrases and taxonomy. Five weeks building a Lovable-fronted description generator with an eval harness tuned to their brand voice and human final-pass.',
+        outcome: 'The team ships 3× more SKUs per month with tighter, on-brand copy. Paid search CTR lifted double digits. Brand voice checks catch off-tone drafts before humans see them.',
+        m: [
+          { n: 3, s: '×', p: '', t: 'SKU description throughput' },
+          { n: 14, s: '%', p: '+', t: 'Lift in paid-search CTR (blended)' },
+          { n: 6, s: ' wks', p: '', t: 'Kickoff to full team rollout' }
+        ]
+      },
+      saas: {
+        logo: 'E', client: 'Elevate AI — B2B SaaS',
+        tag: '8-week engagement · OpenClaw + Claude Code',
+        challenge: 'Sales engineering was gated on human RFP responses. Every deal above $50k needed 30–60 hours of manual RFP work, and the pipeline was expanding into a segment the team could not staff.',
+        approach: 'Two weeks reverse-engineering their best answers into a retrieval corpus. Six weeks building an OpenClaw drafting agent with grounded citations and a red-team eval suite the SE team owns.',
+        outcome: 'Draft RFPs land in under an hour with cited sources. SEs edit rather than write. Pipeline in the new segment is not blocked on human capacity anymore.',
+        m: [
+          { n: 80, s: '%', p: '', t: 'RFP drafting time removed from SE team' },
+          { n: 8, s: ' wks', p: '', t: 'From kickoff to internal launch' },
+          { n: 50, s: '+', p: '$', t: 'k deal segment unblocked' }
+        ]
+      },
+      ops: {
+        logo: 'A', client: 'Acme Corp — enterprise operations',
+        tag: '12-week engagement · Claude Code + OpenClaw',
+        challenge: 'A 90-person operations org ran on Slack, sheets and email. Weekly leadership updates took two people two full days to compile and were often out of date the moment they landed.',
+        approach: 'Three weeks mapping the source-of-truth stack across finance, sales-ops and fulfilment. Nine weeks shipping an OpenClaw analyst agent that pulls, joins and drafts the weekly review — with a human editor and a full source-link trail.',
+        outcome: 'Weekly review shows up in leadership inboxes every Monday 07:00, source-linked and edited. Two analysts redeployed to actual analysis. Leadership decisions moved forward in the calendar week.',
+        m: [
+          { n: 90, s: '%', p: '', t: 'Manual report-writing time removed' },
+          { n: 12, s: ' wks', p: '', t: 'Kickoff to first automated review' },
+          { n: 2, s: '', p: '', t: 'Analysts redeployed to real analysis' }
+        ]
+      }
+    };
+
+    const el = {
+      logo: document.getElementById('case-logo'),
+      client: document.getElementById('case-client'),
+      tag: document.getElementById('case-tag'),
+      challenge: document.getElementById('case-challenge'),
+      approach: document.getElementById('case-approach'),
+      outcome: document.getElementById('case-outcome'),
+      num: [document.getElementById('case-num-1'), document.getElementById('case-num-2'), document.getElementById('case-num-3')],
+      text: [document.getElementById('case-text-1'), document.getElementById('case-text-2'), document.getElementById('case-text-3')]
+    };
+
+    function apply(key) {
+      const d = data[key];
+      if (!d) return;
+      const morphing = document.querySelectorAll('.case-morphing');
+      morphing.forEach(m => m.classList.add('morphing'));
+      setTimeout(() => {
+        el.logo.textContent = d.logo;
+        el.client.textContent = d.client;
+        el.tag.textContent = d.tag;
+        el.challenge.textContent = d.challenge;
+        el.approach.textContent = d.approach;
+        el.outcome.textContent = d.outcome;
+        d.m.forEach((m, i) => {
+          const n = el.num[i], t = el.text[i];
+          if (!n || !t) return;
+          n.dataset.target = m.n;
+          n.dataset.suffix = m.s;
+          n.dataset.prefix = m.p;
+          t.textContent = m.t;
+          // Animate the number
+          const startVal = 0;
+          const duration = 800;
+          const startTime = performance.now();
+          function step(now) {
+            const p = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - p, 3);
+            n.textContent = (m.p || '') + Math.round(eased * m.n) + (m.s || '');
+            if (p < 1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        });
+        morphing.forEach(m => m.classList.remove('morphing'));
+      }, 220);
+    }
+
+    select.addEventListener('change', () => apply(select.value));
   })();
 </script>
 
