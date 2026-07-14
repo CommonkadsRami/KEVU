@@ -2417,6 +2417,62 @@
   .cap-pill svg { width: 15px; height: 15px; stroke: var(--accent); flex-shrink: 0; transition: stroke 0.3s; }
   @media (prefers-reduced-motion: reduce) { .cap-track { animation: none; flex-wrap: wrap; width: auto; justify-content: center; } }
 
+  /* ── Lead capture ─────────────────────────────── */
+  .lead-capture {
+    max-width: 460px;
+    margin: 2rem auto 0;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--border);
+    transition: border-color 0.3s;
+  }
+  .lead-capture-label {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-bottom: 0.8rem;
+    transition: color 0.3s;
+  }
+  .lead-form { display: flex; gap: 0.5rem; }
+  .lead-input {
+    flex: 1;
+    padding: 0.7rem 0.9rem;
+    background: color-mix(in srgb, var(--surface) 60%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+  }
+  .lead-input:focus { outline: none; border-color: var(--accent); }
+  .lead-input::placeholder { color: var(--text-mute); }
+  .lead-submit {
+    flex-shrink: 0;
+    padding: 0 1.1rem;
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  .lead-submit:hover:not(:disabled) { transform: translateY(-1px); }
+  .lead-submit:disabled { opacity: 0.55; cursor: default; }
+  /* Honeypot — visually hidden, off-screen, not display:none (bots skip those) */
+  .lead-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .lead-msg {
+    margin-top: 0.7rem;
+    font-size: 0.82rem;
+    min-height: 1.1em;
+    transition: color 0.3s;
+  }
+  .lead-msg.ok { color: var(--accent-2); }
+  .lead-msg.err { color: #ff6b5b; }
+
   /* Scroll animations */
   .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
   .reveal.in { opacity: 1; transform: translateY(0); }
@@ -3041,6 +3097,17 @@
       <div class="btn-row">
         <a href="https://calendly.com/achahbar-rami/15min" target="_blank" rel="noopener" class="btn btn-primary">Book a 30-min call <span class="arrow">→</span></a>
         <a href="#services" class="btn btn-ghost">Review services</a>
+      </div>
+
+      <div class="lead-capture reveal">
+        <p class="lead-capture-label">Not ready to talk? Get our 1-page overview of how we work.</p>
+        <form class="lead-form" id="lead-form" novalidate>
+          <label for="lead-email" class="lead-hp-label" style="position:absolute;left:-9999px;">Email</label>
+          <input class="lead-input" id="lead-email" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="you@company.com" maxlength="160">
+          <input class="lead-hp" id="lead-company-url" name="company_url" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <button type="submit" class="lead-submit" id="lead-submit">Send it →</button>
+        </form>
+        <p class="lead-msg" id="lead-msg" role="status" aria-live="polite"></p>
       </div>
     </div>
   </div>
@@ -3689,6 +3756,57 @@
     }
     if (!errored) onDone();
   }
+
+  /* Lead capture */
+  (function initLeadCapture() {
+    const form = document.getElementById('lead-form');
+    if (!form) return;
+    const email = document.getElementById('lead-email');
+    const hp = document.getElementById('lead-company-url');
+    const submit = document.getElementById('lead-submit');
+    const msg = document.getElementById('lead-msg');
+    let busy = false;
+    let lastCall = 0;
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (busy) return;
+      const now = Date.now();
+      if (now - lastCall < 800) return;
+      const value = (email.value || '').trim();
+      msg.className = 'lead-msg';
+      if (!EMAIL_RE.test(value)) { msg.textContent = 'Please enter a valid email.'; msg.classList.add('err'); email.focus(); return; }
+      if (hp.value) { msg.textContent = 'Thanks!'; msg.classList.add('ok'); return; } // honeypot tripped — silent success
+
+      lastCall = now;
+      busy = true; submit.disabled = true;
+      const prevLabel = submit.textContent;
+      submit.textContent = 'Sending…';
+      msg.textContent = '';
+
+      let res, data;
+      try {
+        res = await fetch(`${window.AXON_API_BASE || ''}/api/lead`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: value, company_url: hp.value, source: 'cta' }),
+        });
+        data = await res.json().catch(() => ({}));
+      } catch { data = null; }
+
+      if (res && res.ok) {
+        form.reset();
+        msg.textContent = "You're on the list — we'll send the overview shortly.";
+        msg.classList.add('ok');
+      } else {
+        const m = (data && data.error) || 'Something went wrong — email us or book a call instead.';
+        msg.textContent = m;
+        msg.classList.add('err');
+      }
+      busy = false; submit.disabled = false; submit.textContent = prevLabel;
+    });
+  })();
 
   /* Hero scope generator */
   (function initScopeGen() {
