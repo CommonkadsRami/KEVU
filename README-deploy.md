@@ -67,7 +67,36 @@ in `index.html`:
 window.AXON_API_BASE = 'https://your-vercel-app.vercel.app';
 ```
 
-The frontend uses `${window.AXON_API_BASE || ''}/api/claude` for every call.
+The frontend uses `${window.AXON_API_BASE || ''}/api/claude` for every call
+(and `/api/lead` for the email-capture form).
+
+---
+
+## 6. Lead capture (optional — Supabase)
+
+The CTA has an email-capture form ("Not ready to talk? Get our 1-page
+overview") backed by `api/lead.js`, which writes to a Supabase table. Without
+Supabase configured, the form shows a friendly error; everything else works.
+
+**a. Create the table.** In your Supabase project's SQL Editor, run
+`supabase/migrations/0001_leads.sql` (or `supabase db push` if you use the
+CLI). It creates a `leads` table, a unique index on the email, and enables RLS
+with **no public policies** — the table is not reachable via the anon key.
+
+**b. Set two Vercel env vars** (the service-role key bypasses RLS and must stay
+server-side — never put it in the frontend):
+
+```bash
+vercel env add SUPABASE_URL                # https://xxxx.supabase.co
+vercel env add SUPABASE_SERVICE_ROLE_KEY   # Project Settings → API → service_role secret
+vercel --prod                              # redeploy to pick them up
+```
+
+**c. Lock CORS** in `api/lead.js` too (same `ALLOWED_ORIGINS` as `api/claude.js`).
+
+Leads land in the `leads` table (`select * from leads order by created_at desc`).
+The function validates the email, honours a honeypot field, dedupes by email,
+and rate-limits to 10/hour per IP.
 
 ---
 
